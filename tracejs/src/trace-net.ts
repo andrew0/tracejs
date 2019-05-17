@@ -1,6 +1,7 @@
-import TraceConfig, { createDefaultConfig, CONTINUA_PER_FEATURE, NUM_FEATURES, TracePhoneRole } from './trace-param'
+import TraceConfig, { createDefaultConfig, CONTINUA_PER_FEATURE, NUM_FEATURES } from './trace-param'
 import TracePhones from './trace-phones'
 import * as util from './util'
+import { applyRestScaling } from './response-probability'
 
 export default class TraceNet {
   private config: TraceConfig
@@ -76,7 +77,7 @@ export default class TraceNet {
     this.phonemes.spreadPhons(this.config.spread, this.config.spreadScale, this.config.min, this.config.max)
 
     // init feature layer to resting value
-    let rest = util.clamp(this.config.rest.F, this.config.min, this.config.max)
+    let rest = this.clamp(this.config.rest.F)
     for (let fslice = 0; fslice < this.config.fSlices; fslice++) {
       for (let feat = 0; feat < CONTINUA_PER_FEATURE * NUM_FEATURES; feat++) {
         this.featLayer[feat][fslice] = rest
@@ -84,7 +85,7 @@ export default class TraceNet {
     }
 
     // init phon layer to resting value
-    rest = util.clamp(this.config.rest.P, this.config.min, this.config.max)
+    rest = this.clamp(this.config.rest.P)
     for (let slice = 0; slice < this.getPSlices(); slice++) {
       for (let phon = 0; phon < this.config.phonology.length; phon++) {
         this.phonLayer[phon][slice] = rest
@@ -94,31 +95,30 @@ export default class TraceNet {
     // init word layer to resting value
     // Original frequency implementation from cTRACE is being dropped: 
     //  wp->base = rest[W] + fscale*log(1. + wordfreq[i]);
-    rest = util.clamp(this.config.rest.W, this.config.min, this.config.max)
+    rest = this.clamp(this.config.rest.W)
     for (let wslice = 0; wslice < this.getWSlices(); wslice++) {
       for (let word = 0; word < this.config.lexicon.length; word++) {
         this.wordLayer[word][wslice] = rest
       }
     }
 
-    // TODO:
     // frequency applied to the resting level of lexical items
-    if (this.config.freqNode.RDL_rest_s != 0) {
+    if (this.config.freqNode.RDL_rest_s) {
       for (let wslice = 0; wslice < this.getWSlices(); wslice++) {
         for (let word = 0; word < this.config.lexicon.length; word++) {
-          //this.wordLayer[word][wslice] += this.config.freqNode.applyRestFreqScaling(this.config.lexicon[word])
+          this.wordLayer[word][wslice] += applyRestScaling(this.config.freqNode, this.config.lexicon[word].freq)
         }
       }
     }
 
     //priming applied to the resting level of lexical items
-    /*if (tp.getPrimeNode().RDL_rest_s != 0) {
-      for (int wslice = 0; wslice < wSlices; wslice++)
-        for (int word = 0; word < nwords; word++) {
-          if (tp.getLexicon().get(word).getPrime() > 0)
-            wordLayer[word][wslice] += tp.getPrimeNode().applyRestPrimeScaling(tp.getLexicon().get(word));
+    if (this.config.primeNode.RDL_rest_s) {
+      for (let wslice = 0; wslice < this.getWSlices(); wslice++)
+        for (let word = 0; word < this.config.lexicon.length; word++) {
+          if (this.config.lexicon[word].prime > 0)
+            this.wordLayer[word][wslice] += applyRestScaling(this.config.primeNode, this.config.lexicon[word].prime)
         }
-    }*/
+    }
 
     // from C code: tdur = (float)(PWIDTH + POVERLAP)*pp->wscale/FPP = (((6+6)*1)/3)=4
     const tdur = 4
@@ -170,6 +170,10 @@ export default class TraceNet {
     return this.getPSlices()
   }
 
+  private clamp(n: number): number {
+    return util.clamp(n, this.config.min, this.config.max)
+  }
+
   /**
    * Create the input layer
    *  loop through all the phonemes, and copy the corresponding features to it.
@@ -196,9 +200,9 @@ export default class TraceNet {
     for (let i = 0; i < phons.length && slice < this.config.fSlices; i++) {
       // if we encounter a 'splice' phone, proceed accordingly
       if (phons[i] == '{') {
-        const p1 = this.phonemes.get(phons[++i])
+        const p1 = this.phonemes.byLabel(phons[++i])
         const splicePoint: number = +phons[++i]
-        const p2 = this.phonemes.get(phons[++i])
+        const p2 = this.phonemes.byLabel(phons[++i])
         i += 1 // skip the } character
 
         // first half of the spliced phoneme
@@ -222,7 +226,7 @@ export default class TraceNet {
 
         slice += this.config.deltaInput
       } else { // otherwise, we are dealing with a normal, or ambiguous phoneme input.
-        const phon = this.phonemes.get(phons[i])
+        const phon = this.phonemes.byLabel(phons[i])
         //System.out.println("phon->char "+phons.charAt(i+syntactic_incr)+"->"+phon);
         const inputOffset = slice - Math.round(phon.spreadOffset);
         // copy the spread phonemes onto the input layer (aligned correctly)
@@ -250,7 +254,7 @@ export default class TraceNet {
     // apply clamping
     for (let feat = 0; feat < NUM_FEATURES * CONTINUA_PER_FEATURE; feat++) {
       for (let islice = 0; islice < this.config.fSlices; islice++) {
-        this.inputLayer[feat][islice] = util.clamp(this.inputLayer[feat][islice], this.config.min, this.config.max)
+        this.inputLayer[feat][islice] = this.clamp(this.inputLayer[feat][islice])
       }
     }
 
@@ -289,7 +293,7 @@ export default class TraceNet {
       for (let fIndex = 0; fIndex < CONTINUA_PER_FEATURE * NUM_FEATURES; fIndex++)
         for (let fslice = this.inputSlice + 1; fslice < this.config.fSlices && fslice < this.inputSlice + 1 + this.__nreps; fslice++) { //small variation from original
           //input->feature activation
-          this.featNet[fIndex][fslice] += util.clamp(this.config.alpha.IF * this.inputLayer[fIndex][fslice], this.config.min, this.config.max)
+          this.featNet[fIndex][fslice] += this.clamp(this.config.alpha.IF * this.inputLayer[fIndex][fslice])
         }
     }
 
@@ -297,10 +301,8 @@ export default class TraceNet {
     for (let c = 0; c < CONTINUA_PER_FEATURE; c++) {
       for (let f = 0; f < NUM_FEATURES; f++) {
         for (let fslice = 0; fslice < this.config.fSlices; fslice++) {
-          const n = ffi[c][fslice] - Math.max(0, this.featLayer[(c * NUM_FEATURES) + f][fslice] * this.config.gamma.F)
-          if (n > 0) {
-            this.featNet[(c * NUM_FEATURES) + f][fslice] -= n
-          }
+          this.featNet[(c * NUM_FEATURES) + f][fslice] -=
+            Math.max(0, ffi[c][fslice] - Math.max(0, this.featLayer[(c * NUM_FEATURES) + f][fslice] * this.config.gamma.F))
         }
       }
     }
@@ -437,7 +439,7 @@ export default class TraceNet {
               let d = Math.floor(Math.abs(pslice * fpp - fslice))
               if (d >= fSlices) d = fSlices - 1
               if (this.phonLayer[phon][pslice] > 0) //aLPHA connections=only excitatory
-                activation += this.pfw[phon][cont][d] * this.phonLayer[phon][pslice] * this.phonemes.getIndex(phon).features[cont * NUM_FEATURES + feat]
+                activation += this.pfw[phon][cont][d] * this.phonLayer[phon][pslice] * this.phonemes.byIndex(phon).features[cont * NUM_FEATURES + feat]
             }
           }
           this.featNet[cont * NUM_FEATURES + feat][fslice] += this.config.alpha.PF * activation
@@ -463,7 +465,7 @@ export default class TraceNet {
         // fed back to the phoneme layer.
         str = dict[word].phon
         for (let wstart = 0; wstart < str.length; wstart++) {
-          let currPhon = this.phonemes.get(str[wstart])
+          let currPhon = this.phonemes.byLabel(str[wstart])
           wslot = wslice + (wstart * 2)
           pmin = wslot - 1 //??
           if (pmin >= pSlices) break
@@ -539,7 +541,7 @@ export default class TraceNet {
           //for each letter in the current word
           for (let offset = 0; offset < strlen; offset++) {
             //if that letter corresponds to the phoneme we're now considering...
-            if (str.charAt(offset) == this.phonemes.charAt(phon)) {
+            if (str.charAt(offset) == this.phonemes.byIndex(phon).label.charAt(0)) {
               //then determine the temporal range of word units for which it
               //makes sense that the current phoneme should send activation to it.
               wpeak = pslice - (pdur * offset)
@@ -709,7 +711,7 @@ export default class TraceNet {
 
         // final update for phoneme layer 
         this.phonLayer[phon][pslice] += (diff * this.phonNet[phon][pslice]) - (this.config.decay.P * rest);
-        this.phonLayer[phon][pslice] = util.clamp(this.phonLayer[phon][pslice], this.config.min, this.config.max)
+        this.phonLayer[phon][pslice] = this.clamp(this.phonLayer[phon][pslice])
       }
     }
     this.phonNet = util.zeros2D(this.config.phonology.length, pSlices)
@@ -739,19 +741,18 @@ export default class TraceNet {
         else if (this.wordNet[word][slice] < 0)
           t += (t - min) * this.wordNet[word][slice]
         // resting prime & resting freq effects
-        // TODO
-        /*
-        if (tp.getFreqNode().RDL_rest && tp.getLexicon().get(word).getFrequency() > 0 && tp.getPrimeNode().RDL_rest && tp.getLexicon().get(word).getPrime() > 0)
-          tt = wordLayer[word][slice] - ((tp.getRest().W + tp.getFreqNode().applyRestFreqScaling(tp.getLexicon().get(word))) + (tp.getRest().W + tp.getPrimeNode().applyRestPrimeScaling(tp.getLexicon().get(word))));
+        let tt
+        if (this.config.freqNode.RDL_rest_s && this.config.lexicon[word].freq > 0 && this.config.primeNode.RDL_rest_s && this.config.lexicon[word].prime > 0)
+          tt = this.wordLayer[word][slice] - ((this.config.rest.W + applyRestScaling(this.config.freqNode, this.config.lexicon[word].freq))) + (this.config.rest.W + applyRestScaling(this.config.primeNode, this.config.lexicon[word].prime))
         //resting freq effects
-        else if (tp.getFreqNode().RDL_rest && tp.getLexicon().get(word).getFrequency() > 0)
-          tt = wordLayer[word][slice] - (tp.getRest().W + tp.getFreqNode().applyRestFreqScaling(tp.getLexicon().get(word)));
+        else if (this.config.freqNode.RDL_rest_s && this.config.lexicon[word].freq > 0)
+          tt = this.wordLayer[word][slice] - (this.config.rest.W + applyRestScaling(this.config.freqNode, this.config.lexicon[word].freq))
         //resting prime 
-        else if (tp.getPrimeNode().RDL_rest && tp.getLexicon().get(word).getPrime() > 0)
-          tt = wordLayer[word][slice] - (tp.getRest().W + tp.getPrimeNode().applyRestPrimeScaling(tp.getLexicon().get(word)));
+        else if (this.config.primeNode.RDL_rest_s && this.config.lexicon[word].prime > 0)
+          tt = this.wordLayer[word][slice] - (this.config.rest.W + applyRestScaling(this.config.primeNode, this.config.lexicon[word].prime))
         //no resting prime or resting freq effects
-        else*/
-          const tt = this.wordLayer[word][slice] - this.config.rest.W
+        else
+          tt = this.wordLayer[word][slice] - this.config.rest.W
         //if(tt != 0)
         t -= this.config.decay.W * tt
 

@@ -76,7 +76,7 @@ export default {
             .join('\n')
         case 'phoneme':
           return this.phonLayer[this.cycle]
-            .map((row, index) => [this.phonemes && this.phonemes.charAt(index), ...row.map(x => x.toFixed(4))].join('\t'))
+            .map((row, index) => [this.phonemes && this.phonemes.byIndex(index).label, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
         case 'word':
           return this.wordLayer[this.cycle]

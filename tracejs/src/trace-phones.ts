@@ -43,15 +43,11 @@ export default class TracePhones {
     return this.phonemes
   }
 
-  public getIndex(index: number): TracePhoneInternal {
+  public byIndex(index: number): TracePhoneInternal {
     return this.phonemes[index]
   }
 
-  public charAt(index: number) {
-    return this.phonemes[index].label.charAt(0)
-  }
-
-  public get(label: string): TracePhoneInternal {
+  public byLabel(label: string): TracePhoneInternal {
     return this.phonemes.find(x => x.label == label) || this.ambiguousPhonemes.find(x => x.label == label)
   }
 
@@ -137,8 +133,8 @@ export default class TracePhones {
    * @param steps     the number of steps (2-9)
    */
   public makePhonemeContinuum(from: string, to: string, steps: number) {
-    const phon_from = this.get(from)
-    const phon_to = this.get(to)
+    const phon_from = this.byLabel(from)
+    const phon_to = this.byLabel(to)
     if (!phon_from || !phon_to || steps <= 1 || steps > TracePhones.MAX_STEPS) {
       throw new Error('invalid arguments to makePhonemeContinuum')
     }
