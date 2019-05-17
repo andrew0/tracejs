@@ -17,6 +17,9 @@ export default class TraceNet {
   public wordLayer: number[][]
   public wordNet: number[][]
 
+  public globalLexicalCompetitionIndex: number
+  public globalPhonemeCompetitionIndex: number
+
   private pww: number[][]
   private wpw: number[][]
   private fpw: number[][][]
@@ -160,6 +163,9 @@ export default class TraceNet {
         }
       }
     }
+
+    // create input
+    this.createInput()
   }
 
   private getPSlices(): number {
@@ -391,6 +397,7 @@ export default class TraceNet {
     }
     // now, determine again the extent of each phoneme unit,
     // then apply inhibition equally to phons lying on the same phon slice.
+    this.globalPhonemeCompetitionIndex = 0
     for (let phon = 0; phon < this.config.phonology.length; phon++) { //loop over phonemes       
       for (let slice = 0; slice < pSlices; slice++) { // loop over phoneme slices (original configuration 33)
         pmax = slice + halfdur
@@ -406,12 +413,15 @@ export default class TraceNet {
           // application of inhibition occurs here
           if (ppi[i] > 0) {
             this.phonNet[phon][slice] -= ppi[i]
+            this.globalPhonemeCompetitionIndex += ppi[i]
           }
         }
         // here, we make up for self-inhibition, reimbursing nodes for inhibition that 
         // originated from themselves.
         if ((this.phonLayer[phon][slice] * this.config.gamma.P) > 0 && ppi[slice] > 0) {
-          this.phonNet[phon][slice] += ((pmax - pmin) * this.phonLayer[phon][slice]) * this.config.gamma.P
+          const n = ((pmax - pmin) * this.phonLayer[phon][slice]) * this.config.gamma.P
+          this.phonNet[phon][slice] += n
+          this.globalPhonemeCompetitionIndex -= n
         }
         // here, we make up for allophone-inhibition, reimbursing nodes for inhibition
         // that originate from allophones of the target, as defined in the allophon matrix.
@@ -620,6 +630,7 @@ export default class TraceNet {
     }
     // now, repeat the looping over words and slices and apply the inhibition
     // accumulated at each slice to every word unit that overlaps with that slice.
+    this.globalLexicalCompetitionIndex = 0
     for (let wstart = 0; wstart < pSlices; wstart++) {
       for (let word = 0; word < dict.length; word++) {
         let wmin = wstart; //wstart - (1/2 phone width))
@@ -636,11 +647,14 @@ export default class TraceNet {
             if (compensation_factor > 1) compensation_factor = 1
             //double compensation_factor = (((dict.get(word).getPhon().length() / length_normalization_fulcrum ) - 1) * length_normalization_scale) + 1
             //if(compensation_factor<0) compensation_factor=1;
-            this.wordNet[word][wstart] -= wwi[l] * compensation_factor; //if(wwi[l]>0) //inhibition applied here                              
+            const n = wwi[l] * compensation_factor
+            this.wordNet[word][wstart] -= n //if(wwi[l]>0) //inhibition applied here
+            this.globalLexicalCompetitionIndex += n
           }
           //END EXTENSION          
           else {
             this.wordNet[word][wstart] -= wwi[l] //if(wwi[l]>0) //inhibition applied here
+            this.globalLexicalCompetitionIndex += wwi[l]
           }
         }
         // re-imbursement of self-inhibition occurs here.
@@ -649,11 +663,15 @@ export default class TraceNet {
           if (this.config.lengthNormalization) {
             let compensation_factor = 1 / (dict[word].phon.length * this.lengthNormalizationScale)
             if (compensation_factor > 1) compensation_factor = 1
-            this.wordNet[word][wstart] += ((wmax - wmin) * (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * this.config.gamma.W)) * compensation_factor
+            const n = ((wmax - wmin) * (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * this.config.gamma.W)) * compensation_factor
+            this.wordNet[word][wstart] += n
+            this.globalLexicalCompetitionIndex -= n
           }
-          //END EXTENSION          
+          //END EXTENSION
           else {
-            this.wordNet[word][wstart] += ((wmax - wmin) * (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * this.config.gamma.W))
+            const n = ((wmax - wmin) * (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * this.config.gamma.W))
+            this.wordNet[word][wstart] += n
+            this.globalLexicalCompetitionIndex -= n
           }
         }
       }
