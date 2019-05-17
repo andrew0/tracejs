@@ -296,11 +296,12 @@ export default class TraceNet {
     
     // this block copies input activations to the feature layer
     if (this.inputSlice < this.config.fSlices) {
-      for (let fIndex = 0; fIndex < CONTINUA_PER_FEATURE * NUM_FEATURES; fIndex++)
+      for (let fIndex = 0; fIndex < CONTINUA_PER_FEATURE * NUM_FEATURES; fIndex++) {
         for (let fslice = this.inputSlice + 1; fslice < this.config.fSlices && fslice < this.inputSlice + 1 + this.__nreps; fslice++) { //small variation from original
           //input->feature activation
           this.featNet[fIndex][fslice] += this.clamp(this.config.alpha.IF * this.inputLayer[fIndex][fslice])
         }
+      }
     }
 
     // this block applies ffi inhibition to each node in the featue layer, and compensates for self-inhibition
