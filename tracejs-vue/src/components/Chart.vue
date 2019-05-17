@@ -1,20 +1,25 @@
 <script>
-import { Scatter } from 'vue-chartjs'
+import { Scatter, mixins } from 'vue-chartjs'
+const { reactiveProp } = mixins
 
 export default {
   extends: Scatter,
-  props: ['datasets'],
-  mounted() {
-    const options = {
-      responsive: true,
-      maintainAspectRatio: false,
-      elements: {
-        point: {
-          radius: 0
+  mixins: [reactiveProp],
+  data() {
+    return {
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+          point: {
+            radius: 0
+          }
         }
       }
     }
-    this.renderChart({ datasets: this.datasets }, options)
+  },
+  mounted() {
+    this.renderChart(this.chartData, this.options)
   }
 }
 </script>
