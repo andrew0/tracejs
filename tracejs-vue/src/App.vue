@@ -1,39 +1,41 @@
 <template>
   <div id="app">
-    <div style="flex: 0 1 auto; margin: 0.5rem;">
-      <!--<textarea v-model="config" style="width: 300px; height: 150px;" />-->
-      <a class="button" @click="run">Run</a>
-
-      <span style="margin-left: 2rem;">
-        layer:
-        <div class="select">
-          <select v-model="layer">
-            <option value="input">input</option>
-            <option value="feature">feature</option>
-            <option value="phoneme">phoneme</option>
-            <option value="word">word</option>
-            <option value="analysis">analysis</option>
-            <option value="analysischart">analysis (chart)</option>
-          </select>
+    <div style="flex: 0 1 auto;">
+      <section class="hero is-primary" style="padding: 0.5rem 1rem 0 1rem;">
+        <div class="hero-foot">
+          <nav class="tabs is-boxed">
+            <ul>
+              <li v-for="(tab, index) in tabs" :key="index" :class="{ 'is-active': activeTab == index }">
+                <a @click="activeTab = index">{{ tab }}</a>
+              </li>
+            </ul>
+          </nav>
         </div>
-      </span>
+      </section>
 
-      <span v-if="!layer.startsWith('analysis')" style="margin-left: 2rem;">
-        cycle:
-        <a class="button" @click="cycle = clamp(cycle - 1, 0, numCycles - 1)">-</a>
-        <div class="select">
-          <select v-model="cycle">
-            <option v-for="(n, index) in numCycles" :key="index" :value="index">{{ index }}</option>
-          </select>
-        </div>
-        <a class="button" @click="cycle = clamp(cycle + 1, 0, numCycles - 1)">+</a>
-      </span>
+      <section v-if="activeTab != 0" style="padding: 0.5rem;">
+        <a class="button" @click="run">Run</a>
+
+        <span v-if="[1, 2 , 3, 4].indexOf(activeTab) >= 0" style="margin-left: 2rem;">
+          cycle:
+          <a class="button" @click="cycle = clamp(cycle - 1, 0, numCycles - 1)">-</a>
+          <div class="select">
+            <select v-model="cycle">
+              <option v-for="(n, index) in numCycles" :key="index" :value="index">{{ index }}</option>
+            </select>
+          </div>
+          <a class="button" @click="cycle = clamp(cycle + 1, 0, numCycles - 1)">+</a>
+        </span>
+      </section>
     </div>
 
-    <pre v-if="layer != 'analysischart'" style="flex: 1 1 auto; margin: 0; background: #eee; width: 100%; overflow: scroll;">{{ dat }}</pre>
-    <div v-else style="flex: 1 1 auto; display: flex; min-height: 0;">
+    <div v-if="activeTab == 0" style="display: flex; flex: 1 1 auto;">
+      <config :config="config" />
+    </div>
+    <div v-else-if="activeTab == 6" style="display: flex; flex: 1 1 auto; min-height: 0;">
       <chart :chart-data="chartData" class="wrapper" />
     </div>
+    <pre v-else style="flex: 1 1 auto; margin: 0; background: #eee; width: 100%; overflow: scroll;">{{ dat }}</pre>
     <!-- <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/> -->
   </div>
@@ -42,6 +44,7 @@
 <script>
 import { TraceSim, createDefaultConfig, doSimAnalysis, TraceDomain, TraceWatchType, TraceCalculationType, TraceChoice } from 'tracejs'
 import Chart from './components/Chart.vue'
+import Config from './components/Config.vue'
 
 const chartColors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#000000']
 
@@ -49,7 +52,9 @@ export default {
   name: 'app',
   data() {
     return {
-      layer: 'analysischart',
+      tabs: ['Config', 'Input', 'Feature', 'Phoneme', 'Word', 'Analysis', 'Analysis (Chart)'],
+      activeTab: 0,
+      config: createDefaultConfig(),
       cycle: -1,
       numCycles: 0,
       analysis: [],
@@ -58,56 +63,59 @@ export default {
   },
   created() {
     // create the sim here, and not in data, because we don't want Vue to watch the data changes
-    const config = createDefaultConfig()
-    config.modelInput = '-gradu^l-'
-    config.decay.W = 0.03
-    this.sim = new TraceSim(config)
+    // this.config.modelInput = '-gradu^l-'
+    // this.config.decay.W = 0.03
+    this.sim = new TraceSim(JSON.parse(JSON.stringify(this.config)))
   },
   computed: {
     dat() {
-      if (this.cycle < 0 || this.numCycles <= this.cycle)
+      if (!this.sim || this.cycle < 0 || this.numCycles <= this.cycle)
         return ''
 
-      switch (this.layer) {
-        case 'input':
+      switch (this.activeTab) {
+        case 1:
           return this.sim.inputLayer[this.cycle]
             .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
-        case 'feature':
+        case 2:
           return this.sim.featLayer[this.cycle]
             .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
-        case 'phoneme':
+        case 3:
           return this.sim.phonLayer[this.cycle]
             .map((row, index) => [this.sim.phonemes && this.sim.phonemes.byIndex(index).label, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
-        case 'word':
+        case 4:
           return this.sim.wordLayer[this.cycle]
             .map((row, index) => [this.sim.config.lexicon[index].phon, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
-        case 'analysis':
-          return [
-            ['cycle', ...this.chartData.datasets.map(x => x.label.padEnd(18))].join('\t'),
-            ...Array.from(Array(this.numCycles), (_, cycle) => [
-              cycle,
-              ...this.chartData.datasets.map(x => x.data[cycle].y)
-            ].join('\t'))
-          ].join('\n')
+        case 5:
+          return this.analysisData
         default:
           return ''
       }
+    },
+    analysisData() {
+      return [
+        ['cycle', ...this.chartData.datasets.map(x => x.label.padEnd(18))].join('\t'),
+        ...Array.from(Array(this.numCycles), (_, cycle) => [
+          cycle,
+          ...this.chartData.datasets.map(x => x.data[cycle].y.toFixed(18))
+        ].join('\t'))
+      ].join('\n')
     }
   },
   methods: {
     run() {
       console.time('trace.js')
+      this.sim = new TraceSim(JSON.parse(JSON.stringify(this.config)))
 
       this.sim.cycle(60)
       this.numCycles = this.sim.getStepsRun()
       this.cycle = this.clamp(this.cycle, 0, this.numCycles)
 
       this.chartData = {
-        datasets: doSimAnalysis(this.sim, TraceDomain.WORDS, TraceWatchType.WATCHTOPN, [], 10, TraceCalculationType.STATIC, 4, TraceChoice.FORCED, 4)
+        datasets: doSimAnalysis(this.sim, TraceDomain.WORDS, TraceWatchType.WATCHTOPN, [], 10, TraceCalculationType.STATIC, 4, TraceChoice.NORMAL, 0)
           .map((x, idx) => ({
             ...x,
             fill: false,
@@ -122,7 +130,7 @@ export default {
       return Math.min(Math.max(num, min), max)
     }
   },
-  components: { Chart }
+  components: { Chart, Config }
 }
 </script>
 
