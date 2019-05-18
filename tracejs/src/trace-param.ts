@@ -134,6 +134,13 @@ export default interface TraceConfig {
   allophoneRelations: TraceAllophoneRelation[]
 }
 
+export const createDefaultPhoneme = (): TracePhone => ({
+  label: '',
+  features: Array(NUM_FEATURES * CONTINUA_PER_FEATURE).fill(0),
+  durationScalar: Array(CONTINUA_PER_FEATURE).fill(1),
+  phonologicalRole: TracePhoneRole.NORMAL
+})
+
 /**
  * Creates a TraceConfig object with default values. Uses a function
  * instead of a const to prevent reference from getting mutated.

@@ -7,11 +7,11 @@
           :key="index"
           :class="{ 'list-item': true, 'is-active': phoneme === activePhoneme }"
           @click="activePhoneme = phoneme">
-          {{ phoneme.label }}
+          {{ phoneme.label || 'null' }}
         </a>
       </div>
-      <a class="button">Add phoneme</a>
-      <a class="button">Delete selected</a>
+      <a class="button" @click="addPhoneme">Add phoneme</a>
+      <a class="button" @click="deleteSelected">Delete selected</a>
     </div>
     <div v-if="activePhoneme" class="column">
       <div class="field is-horizontal" style="width: 8rem;">
@@ -65,6 +65,8 @@
 </template>
 
 <script>
+import { createDefaultPhoneme } from 'tracejs'
+
 export default {
   props: {
     phonemes: {
@@ -83,6 +85,20 @@ export default {
   },
   created() {
     this.activePhoneme = this.sortedPhonemes[0]
+  },
+  methods: {
+    deleteSelected() {
+      const index = this.phonemes.indexOf(this.activePhoneme)
+      if (index >= 0) {
+        this.phonemes.splice(index, 1)
+        this.activePhoneme = this.phonemes[Math.min(index, this.phonemes.length - 1)]
+      }
+    },
+    addPhoneme() {
+      const phoneme = createDefaultPhoneme()
+      this.phonemes.push(phoneme)
+      this.activePhoneme = phoneme
+    }
   },
   computed: {
     sortedPhonemes() {
