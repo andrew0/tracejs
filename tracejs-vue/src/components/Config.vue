@@ -8,6 +8,8 @@
       </ul>
     </div>
     <div style="margin: 1rem;">
+      <!-- when we pass the config props to the components, they are passed by reference -->
+      <!-- this means that the values will be automatically updated -->
       <phoneme-config v-if="activeTab == 0" :phonemes="config.phonology" />
       <lexicon-config v-if="activeTab == 1" :lexicon="config.lexicon" />
     </div>
@@ -21,7 +23,7 @@ import LexiconConfig from './LexiconConfig.vue'
 export default {
   props: {
     config: Object,
-    required: true
+    default: () => ({})
   },
   data() {
     return {

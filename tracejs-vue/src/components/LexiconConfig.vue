@@ -28,7 +28,7 @@ export default {
   props: {
     lexicon: {
       type: Array,
-      required: true
+      default: () => []
     }
   },
   methods: {

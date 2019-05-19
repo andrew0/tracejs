@@ -71,7 +71,7 @@ export default {
   props: {
     phonemes: {
       type: Array,
-      required: true
+      default: () => []
     }
   },
   data() {
@@ -89,9 +89,10 @@ export default {
   methods: {
     deleteSelected() {
       const index = this.phonemes.indexOf(this.activePhoneme)
+      const sortedIndex = this.sortedPhonemes.indexOf(this.activePhoneme)
       if (index >= 0) {
         this.phonemes.splice(index, 1)
-        this.activePhoneme = this.phonemes[Math.min(index, this.phonemes.length - 1)]
+        this.activePhoneme = this.sortedPhonemes[Math.min(sortedIndex, this.sortedPhonemes.length - 1)]
       }
     },
     addPhoneme() {
@@ -102,7 +103,10 @@ export default {
   },
   computed: {
     sortedPhonemes() {
-      return this.phonemes.sort((a, b) => a.label.localeCompare(b.label))
+      // we create copy before sorting because vue doesn't like side effects in computed props
+      // the v-model will still update the original value, because the copied array contains
+      // references to the same phoneme objects in the original array
+      return [...this.phonemes].sort((a, b) => a.label.localeCompare(b.label))
     }
   }
 }

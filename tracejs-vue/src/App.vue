@@ -33,7 +33,7 @@
       <config :config="config" />
     </div>
     <div v-else-if="activeTab == 6" style="display: flex; flex: 1 1 auto; min-height: 0;">
-      <chart :chart-data="chartData" class="wrapper" />
+      <analysis :chart-data="chartData" :config="analysisConfig" />
     </div>
     <pre v-else style="flex: 1 1 auto; margin: 0; background: #eee; width: 100%; overflow: scroll;">{{ dat }}</pre>
     <!-- <img alt="Vue logo" src="./assets/logo.png">
@@ -42,9 +42,9 @@
 </template>
 
 <script>
-import { TraceSim, createDefaultConfig, doSimAnalysis, TraceDomain, TraceWatchType, TraceCalculationType, TraceChoice } from 'tracejs'
-import Chart from './components/Chart.vue'
+import { TraceSim, createDefaultConfig, doSimAnalysis, TraceDomain, TraceCalculationType, TraceChoice } from 'tracejs'
 import Config from './components/Config.vue'
+import Analysis from './components/Analysis.vue'
 
 const chartColors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#000000']
 
@@ -55,6 +55,14 @@ export default {
       tabs: ['Config', 'Input', 'Feature', 'Phoneme', 'Word', 'Analysis', 'Analysis (Chart)'],
       activeTab: 0,
       config: createDefaultConfig(),
+      analysisConfig: {
+        domain: TraceDomain.WORDS,
+        itemsToWatch: 10,
+        calculationType: TraceCalculationType.STATIC,
+        alignment: 4,
+        choice: TraceChoice.NORMAL,
+        kValue: 0
+      },
       cycle: -1,
       numCycles: 0,
       analysis: [],
@@ -107,6 +115,7 @@ export default {
   },
   methods: {
     run() {
+      // eslint-disable-next-line
       console.time('trace.js')
       this.sim = new TraceSim(JSON.parse(JSON.stringify(this.config)))
 
@@ -114,8 +123,20 @@ export default {
       this.numCycles = this.sim.getStepsRun()
       this.cycle = this.clamp(this.cycle, 0, this.numCycles)
 
+      const simConfig = {
+        sim: this.sim,
+        domain: TraceDomain.WORDS,
+        itemsToWatch: 10,
+        calculationType: TraceCalculationType.STATIC,
+        alignment: 4,
+        choice: TraceChoice.NORMAL,
+        kValue: 0
+      }
       this.chartData = {
-        datasets: doSimAnalysis(this.sim, TraceDomain.WORDS, TraceWatchType.WATCHTOPN, [], 10, TraceCalculationType.STATIC, 4, TraceChoice.NORMAL, 0)
+        datasets: doSimAnalysis({
+          ...this.analysisConfig,
+          sim: this.sim
+        })
           .map((x, idx) => ({
             ...x,
             fill: false,
@@ -124,13 +145,14 @@ export default {
           }))
       }
 
+      // eslint-disable-next-line
       console.timeEnd('trace.js')
     },
     clamp(num, min, max) {
       return Math.min(Math.max(num, min), max)
     }
   },
-  components: { Chart, Config }
+  components: { Config, Analysis }
 }
 </script>
 
@@ -143,12 +165,5 @@ body, html {
   height: 100%;
   display: flex;
   flex-flow: column;
-}
-.wrapper {
-  position: relative;
-  flex: 1;
-  width: 100%;
-  min-height: 0;
-  min-width: 0;
 }
 </style>
