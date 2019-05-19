@@ -10,13 +10,15 @@
     <div style="margin: 1rem;">
       <!-- when we pass the config props to the components, they are passed by reference -->
       <!-- this means that the values will be automatically updated -->
-      <phoneme-config v-if="activeTab == 0" :phonemes="config.phonology" />
-      <lexicon-config v-if="activeTab == 1" :lexicon="config.lexicon" />
+      <parameters-config v-if="activeTab == 0" :config="config" />
+      <phoneme-config v-if="activeTab == 1" :phonemes="config.phonology" />
+      <lexicon-config v-if="activeTab == 2" :lexicon="config.lexicon" />
     </div>
   </div>
 </template>
 
 <script>
+import ParametersConfig from './ParametersConfig.vue'
 import PhonemeConfig from './PhonemeConfig.vue'
 import LexiconConfig from './LexiconConfig.vue'
 
@@ -27,11 +29,11 @@ export default {
   },
   data() {
     return {
-      tabs: ['Phonology', 'Lexicon'],
+      tabs: ['Parameters', 'Phonology', 'Lexicon'],
       activeTab: 0
     }
   },
-  components: { PhonemeConfig, LexiconConfig }
+  components: { ParametersConfig, PhonemeConfig, LexiconConfig }
 }
 </script>
 
