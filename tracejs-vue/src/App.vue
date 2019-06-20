@@ -123,20 +123,11 @@ export default {
       this.numCycles = this.sim.getStepsRun()
       this.cycle = this.clamp(this.cycle, 0, this.numCycles)
 
-      const simConfig = {
-        sim: this.sim,
-        domain: TraceDomain.WORDS,
-        itemsToWatch: 10,
-        calculationType: TraceCalculationType.STATIC,
-        alignment: 4,
-        choice: TraceChoice.NORMAL,
-        kValue: 0
-      }
+      // do the simulation analysis with the values that were modified by the Analysis component
+      // make sure to attach sim to config
+      // then configure each row with the chart.js options
       this.chartData = {
-        datasets: doSimAnalysis({
-          ...this.analysisConfig,
-          sim: this.sim
-        })
+        datasets: doSimAnalysis({ ...this.analysisConfig, sim: this.sim })
           .map((x, idx) => ({
             ...x,
             fill: false,

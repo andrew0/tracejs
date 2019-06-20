@@ -12,7 +12,8 @@ export default {
         maintainAspectRatio: false,
         elements: {
           point: {
-            radius: 0
+            radius: 0,
+            hitRadius: 0
           }
         }
       }

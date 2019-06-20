@@ -37,7 +37,7 @@
           <tr v-for="(feat, featIndex) in numFeatures" :key="featIndex">
             <td>{{ feat }}</td>
             <td v-for="(_, contIndex) in continua.length" :key="contIndex" class="is-paddingless">
-              <input class="borderless-input" type="text" v-model="activePhoneme.features[contIndex * numFeatures + featIndex]" />
+              <input class="borderless-input" style="width: 5rem;" type="text" v-model="activePhoneme.features[contIndex * numFeatures + featIndex]" />
             </td>
           </tr>
         </tbody>
@@ -55,7 +55,7 @@
         <tbody>
           <tr>
             <td v-for="(_, contIndex) in continua.length" :key="contIndex" class="is-paddingless">
-              <input class="borderless-input" type="text" v-model="activePhoneme.durationScalar[contIndex]" />
+              <input class="borderless-input" style="width: 5rem;" type="text" v-model="activePhoneme.durationScalar[contIndex]" />
             </td>
           </tr>
         </tbody>
