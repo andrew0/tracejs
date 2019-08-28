@@ -1,0 +1,45 @@
+#!/usr/bin/env tclsh
+
+proc readfile fn {
+	set h	[open $fn r]
+	set dat	[read $h]
+	close $h
+	return $dat
+}
+
+lassign $argv cmd callgraphs_fn
+
+proc callgraphs_fn {} {
+	global callgraphs_fn
+
+	if {$callgraphs_fn ne ""} {
+		return $callgraphcs_fn
+	}
+
+	set dir	[pwd]
+	while {$dir ne "/"} {
+		set candidate	[file join $dir callgraph]
+		if {[file readable $candidate]} {
+			return $candidate
+		}
+		set dir	[file dirname $dir]
+	}
+	error "No callgraph lookup file found"
+}
+
+set callgraphs	[readfile [callgraphs_fn]]
+
+proc q s {string map {: \\: \t \\\t} $s}
+
+if {![dict exists $callgraphs $cmd]} {
+	puts "# No callers found for \"$cmd\""
+	exit 0
+}
+#puts "# Callers of \"$cmd\""
+dict for {caller callrecs} [dict get $callgraphs $cmd] {
+	foreach callrec $callrecs {
+		lassign $callrec fn f_line f_char t_line t_char
+		puts [format "@c %s:%d.%d\t\"%s\"" [q $fn] $f_line $f_char [q $caller]]
+	}
+}
+

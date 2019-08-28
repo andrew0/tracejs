@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && rm -rf dist/lib && cp -a lib dist/lib",
     "test": "jest"
   },
   "author": "",
@@ -20,6 +20,7 @@
     "xmlbuilder": "^13.0.2"
   },
   "dependencies": {
-    "fast-xml-parser": "^3.12.16"
+    "fast-xml-parser": "^3.12.16",
+    "requirejs": "^2.3.6"
   }
 }

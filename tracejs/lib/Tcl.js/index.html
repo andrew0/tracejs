@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Department of Inadvisably Applied Javascript</title>
+        <script data-main="test" src="demos/js/require.js"></script>
+		<!-- <script type="text/javascript" src="tcl-built.js"></script> -->
+		<style type="text/css">
+			body {
+				background: #000;
+				color: #ccc;
+				font-size: 12pt;
+			}
+			.tok:hover {
+				background: yellow;
+				color: black;
+			}
+			.tok_SYNTAX, .tok_END, .tok_EOL {
+				color: #555;
+			}
+			.tok_COMMENT {
+				color: #533;
+			}
+			.tok_SPACE {
+				border-bottom: 1px solid #444;
+			}
+			.tok_commandname {
+				color: #ee0;
+			}
+			.tok_VAR, .tok_ARRAY {
+				color: #55f;
+			}
+			.tok_INDEX {
+				color: #99f;
+			}
+			.tok_ESCAPE {
+				background: rgba(255, 60, 128, 0.3);
+				color: black;
+			}
+			.tclresult {
+				background: #ddd;
+				color: black;
+			}
+			.tclerror {
+				background: #e00;
+				color: black;
+			}
+		</style>
+	</head>
+	<body>
+		<button type="button" id="test1">Run Test1</button>
+		<button type="button" id="test2">Run Test2</button>
+		<button type="button" id="test3">Run Test3</button>
+		<button type="button" id="test4">Run Test4</button>
+		<button type="button" id="test5">Run Test5</button>
+		<button type="button" id="test6">Run Test6</button>
+		<h2>String Tests</h2>
+		<button type="button" id="str1">string length</button>
+		<button type="button" id="str2">string map</button>
+		<button type="button" id="str3">string trim</button>
+		<button type="button" id="str4">string trimleft</button>
+		<button type="button" id="str5">string trimright</button>
+		<button type="button" id="str6">string tolower</button>
+		<button type="button" id="str7">string toupper</button>
+		<button type="button" id="str8">string totitle</button>
+		<button type="button" id="str9">string bytelength</button>
+		<button type="button" id="str10">string first</button>
+		<button type="button" id="str11">string last</button>
+		<button type="button" id="str12">string index</button>
+		<button type="button" id="str13">string range</button>
+		<button type="button" id="str14">string reverse</button>
+		<button type="button" id="str15">string repeat</button>
+		<button type="button" id="str16">string replace</button>
+		<button type="button" id="str17">string match</button>
+		<button type="button" id="str18">string wordstart</button>
+		<button type="button" id="str19">string wordend</button>
+		<button type="button" id="str20">string compare</button>
+		<button type="button" id="str21">string equal</button>
+		<button type="button" id="str22">string is</button>
+		<h2>List Tests</h2>
+		<button type="button" id="list1">list foo bar</button>
+		<h2>Dict Tests</h2>
+		<button type="button" id="test7">dict get</button>
+		<button type="button" id="test8">dict keys</button>
+		<button type="button" id="test9">dict set</button>
+		<button type="button" id="test10">dict merge</button>
+		<button type="button" id="test11">dict create</button>
+		<button type="button" id="test12">dict exists</button>
+		<h2>Expr Tests</h2>
+		<button type="button" id="test13">parse expr</button>
+		<button type="button" id="expr2">string compare1</button>
+		<button type="button" id="expr3">string compare2</button>
+		<h2>Control Structure Tests</h2>
+		<button type="button" id="cs1">if</button>
+		<button type="button" id="cs2">for</button>
+		<button type="button" id="cs3">while</button>
+		<button type="button" id="cs4">foreach</button>
+		<button type="button" id="cs5">lmap</button>
+		<h2>Callframe Tests</h2>
+		<button type="button" id="cf1">proc</button>
+		<button type="button" id="cf2">proc twice</button>
+		<h2>Profiling</h2>
+		<button type="button" id="prof1">nop</button>
+		<button type="button" id="prof2">proc</button>
+		<button type="button" id="prof3">custom expr for</button>
+		<button type="button" id="prof4">pure js for loop</button>
+		<h2>Command Redefinition</h2>
+		<button type="button" id="cmdredef1">Cmd Cache Managment</button>
+		<h1>Output:</h1>
+		<div id="output"></div>
+	</body>
+</html>

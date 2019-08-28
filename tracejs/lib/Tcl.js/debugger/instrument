@@ -1,0 +1,206 @@
+#!/usr/bin/env node
+/*jshint eqnull: true */
+
+var requirejs = require('requirejs');
+requirejs.config({
+	baseUrl: '/home/cyan/git',
+	paths: {
+		tcl:	'Tcl.js/amd'
+	},
+	nodeRequire: require
+});
+
+requirejs([
+	'tcl/parser',
+	'tcl/parser_utils',
+	'tcl/list'
+], function(
+	parser,
+	parser_utils,
+	tcllist
+){
+'use strict';
+
+function parse_script(script_str) {
+	return parser_utils.deep_parse(parser.parse_script(script_str));
+}
+
+function reconstitute_word(word) {
+	var script='', k, token;
+	for (k=0; k<word.length; k++) {
+		token = word[k];
+		switch (token[0]) {
+			case parser.SCRIPT:
+				script += reconstitute(token[1]);
+				break;
+			case parser.SCRIPTARG:
+				script += reconstitute(token[2][1]);
+				break;
+			case parser.INDEX:
+				script += reconstitute_word(token[1]);
+				break;
+			default:
+				script += token[1];
+		}
+	}
+	return script;
+}
+
+function reconstitute(commands) {
+	var i, j, script='', command, word;
+
+	for (i=0; i<commands.length; i++) {
+		command = commands[i];
+		for (j=0; j<command.length; j++) {
+			word = command[j];
+			script += reconstitute_word(word);
+		}
+	}
+
+	return script;
+}
+
+function instrument(commands) {
+	var i, j, k, command, newcommand, word, token, outcommands=[], endtok, cmdofs, cmdendofs;
+
+	for (i=0; i<commands.length; i++) {
+		command = commands[i];
+		cmdofs = null;
+		for (j=0; j<command.length; j++) {
+			word = command[j];
+			for (k=0; k<word.length; k++) {
+				token = word[k];
+				if (token[0] !== parser.SPACE && token[0] !== parser.COMMENT && cmdofs == null) {
+					cmdofs = token[3];
+				}
+				switch (token[0]) {
+					case parser.SCRIPT:
+						token[1] = instrument(token[1]);
+						break;
+					case parser.SCRIPTARG:
+						token[2][1] = instrument(token[2][1]);
+						break;
+					case parser.END:
+						endtok = word.pop();
+						/*
+						endtok = token.slice();
+						word[k] = [parser.SYNTAX, ''];
+						*/
+				}
+				if (token[0] !== parser.END) {
+					cmdendofs = token[3] + token[1].length-1;
+				}
+			}
+		}
+		if (parser_utils.real_words(command).length === 0) {
+			outcommands.push(command);
+		} else {
+			newcommand = [
+				[[parser.TXT, 'する']],
+				[[parser.SPACE, ' '], [parser.TXT, cmdofs]],
+				[[parser.SPACE, ' '], [parser.TXT, cmdendofs]],
+				[[parser.SPACE, ' '], [parser.TXT, tcllist.array2list([reconstitute([command])])], endtok],
+			];
+			outcommands.push(newcommand);
+		}
+	}
+
+	return outcommands;
+}
+
+var stdin = process.openStdin(),
+	source = '';
+
+stdin.on('data', function(chunk){
+	source += chunk;
+});
+stdin.on('end', function(){
+	var	parsed = parse_script(source)[1],
+		instrumented = instrument(parsed),
+		srckey = Math.round(Math.random()*Math.pow(2,20));
+
+	instrumented.unshift([
+		[[parser.txt, 'global __breakpoints __debug; array set __breakpoints {}; set __debug(stepping) 1'], [parser.END, '\n']],
+	],[
+		[[parser.TXT, 'proc']],
+		[[parser.SPACE, ' '], [parser.TXT, 'てがみ']],
+		[[parser.SPACE, ' '], [parser.TXT, '{t m}']],
+		[[parser.SPACE, ' '], [parser.TXT, '{return [list $t [string length $m]]\\n$m}'], [parser.END, '\n']]
+	],[
+		[[parser.TXT, 'proc']],
+		[[parser.SPACE, ' '], [parser.TXT, 'みる']],
+		[[parser.SPACE, ' '], [parser.TXT, '{}']],
+		[[parser.SPACE, ' '], [parser.TXT, '{set l [gets [こ]]; read [こ] $l}'], [parser.END, '\n']]
+	],[
+		[[parser.TXT, 'proc']],
+		[[parser.SPACE, ' '], [parser.TXT, 'こ']],
+		[[parser.SPACE, ' '], [parser.TXT, '{}']],
+		[[parser.SPACE, ' '], [parser.TXT, '{'+
+		'	global こ\n'+
+		'	if {![info exists こ]} {\n'+
+		'		set こ [socket localhost 1234]\n'+
+		'		fconfigure [set こ] -blocking 1 -buffering none -translation binary\n'+
+		'		puts -nonewline [set こ] [てがみ source '+tcllist.to_tcl([[srckey, source]])+']\n'+
+		'	}\n'+
+		'	set こ\n'+
+		'}'], [parser.END, '\n']]
+	],[
+		[[parser.TXT, 'proc']],
+		[[parser.SPACE, ' '], [parser.TXT, 'する']],
+		[[parser.SPACE, ' '], [parser.TXT, '{o e s}']],
+		[[parser.SPACE, ' '], [parser.TXT, '{\n'+
+		'	global __debug __breakpoints\n'+
+		//'	puts "する stepping $__debug(stepping), breakpoints: ([array names __breakpoints]), {[string range '+tcllist.to_tcl([source])+' $o [expr {$o+30}]]}"\n'+
+		'	if {[info exists __breakpoints($o)]} {\n'+
+		'		set __debug(stepping)	1\n'+
+		'		if {$__breakpoints($o) == "oneshot"} {array unset __breakpoints $o}\n'+
+		'	}\n'+
+		'	if {$__debug(stepping)} {\n'+
+		'		puts -nonewline [こ] [てがみ enter [list '+srckey+' $o $e]]\n'+
+		'		while {1} {set msg [みる]\n'+
+		'			set op	[lindex $msg 0]\n'+
+		'			switch -- $op {\n'+
+		'				step break\n'+
+		'				exec {set code [catch {uplevel 1 [lindex $msg 1]} res]; puts -nonewline [こ] [てがみ answer [list $code $res]]}\n'+
+		'				instead {set s [lindex $msg 1]}\n'+
+		'				set_breakpoint {set __breakpoints([lindex $msg 1]) 1}\n'+
+		'				clear_breakpoint {array unset __breakpoints [lindex $msg 1]}\n'+
+		'				continue {set __debug(stepping) 0; break}\n'+
+		'			}\n'+
+		'		}\n'+
+		'	}\n'+
+		//'	puts "running command"\n'+
+		'	set code	[catch {uplevel 1 $s} res]\n'+
+		'	if {$code == 1} {\n'+
+		'		set __debug(stepping) 1\n'+
+		'	}\n'+
+		'	if {$__debug(stepping)} {\n'+
+		'		puts -nonewline [こ] [てがみ leave [list '+srckey+' $o $e $code $res]]\n'+
+		'		while {1} {set msg [みる]\n'+
+		'			set op	[lindex $msg 0]\n'+
+		'			switch -- $op {\n'+
+		'				step break\n'+
+		'				exec {set c [catch {uplevel 1 [lindex $msg 1]} r]; puts -nonewline [こ] [てがみ answer [list $c $r]]}\n'+
+		'				set_breakpoint {set __breakpoints([lindex $msg 1]) 1}\n'+
+		'				clear_breakpoint {array unset __breakpoints [lindex $msg 1]}\n'+
+		'				continue {set __debug(stepping) 0; break}\n'+
+		'			}\n'+
+		'		}\n'+
+		'	}\n'+
+		'	switch -- $code {\n'+
+		'		0 {return $res}\n'+
+		'		1 {error $res}\n'+
+		'		2 {return -code return $res}\n'+
+		'		3 {return -code break}\n'+
+		'		4 {return -code continue}\n'+
+		'		default {return -code $code $res}\n'+
+		'	}\n'+
+		'}'], [parser.END, '\n']]
+	]);
+
+	console.log(reconstitute(instrumented));
+
+	process.exit();
+});
+});
+
