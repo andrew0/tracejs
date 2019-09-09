@@ -32,18 +32,20 @@
     <div v-if="activeTab == 0" style="display: flex; flex: 1 1 auto;">
       <config :config="config" />
     </div>
-    <div v-else-if="activeTab == 6" style="display: flex; flex: 1 1 auto; min-height: 0;">
+    <div v-if="activeTab == 1" style="display: flex; flex: 1 1 auto; min-height: 0;">
+      <simulation-page :featureData="featureData" />
+    </div>
+    <div v-else-if="activeTab == 7" style="display: flex; flex: 1 1 auto; min-height: 0;">
       <analysis :chart-data="chartData" :config="analysisConfig" />
     </div>
     <pre v-else style="flex: 1 1 auto; margin: 0; background: #eee; width: 100%; overflow: scroll;">{{ dat }}</pre>
-    <!-- <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/> -->
   </div>
 </template>
 
 <script>
 import { TraceSim, createDefaultConfig, doSimAnalysis, TraceDomain, TraceCalculationType, TraceChoice } from 'tracejs'
 import Config from './components/Config.vue'
+import SimulationPage from './components/SimulationPage.vue'
 import Analysis from './components/Analysis.vue'
 
 const chartColors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#000000']
@@ -52,7 +54,7 @@ export default {
   name: 'app',
   data() {
     return {
-      tabs: ['Config', 'Input', 'Feature', 'Phoneme', 'Word', 'Analysis', 'Analysis (Chart)'],
+      tabs: ['Config', 'Simulation', 'Input', 'Feature', 'Phoneme', 'Word', 'Analysis', 'Analysis (Chart)'],
       activeTab: 0,
       config: createDefaultConfig(),
       analysisConfig: {
@@ -66,7 +68,8 @@ export default {
       cycle: -1,
       numCycles: 0,
       analysis: [],
-      chartData: { datasets: [] }
+      chartData: { datasets: [] },
+      featureData: []
     }
   },
   created() {
@@ -81,23 +84,23 @@ export default {
         return ''
 
       switch (this.activeTab) {
-        case 1:
+        case 2:
           return this.sim.inputLayer[this.cycle]
             .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
-        case 2:
+        case 3:
           return this.sim.featLayer[this.cycle]
             .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
-        case 3:
+        case 4:
           return this.sim.phonLayer[this.cycle]
             .map((row, index) => [this.sim.phonemes && this.sim.phonemes.byIndex(index).label, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
-        case 4:
+        case 5:
           return this.sim.wordLayer[this.cycle]
             .map((row, index) => [this.sim.config.lexicon[index].phon, ...row.map(x => x.toFixed(4))].join('\t'))
             .join('\n')
-        case 5:
+        case 6:
           return this.analysisData
         default:
           return ''
@@ -111,6 +114,11 @@ export default {
           ...this.chartData.datasets.map(x => x.data[cycle].y.toFixed(18))
         ].join('\t'))
       ].join('\n')
+    }
+  },
+  watch: {
+    cycle: function() {
+      this.updateSimPage()
     }
   },
   methods: {
@@ -136,14 +144,23 @@ export default {
           }))
       }
 
+      this.updateSimPage()
+
       // eslint-disable-next-line
       console.timeEnd('trace.js')
     },
     clamp(num, min, max) {
       return Math.min(Math.max(num, min), max)
+    },
+    updateSimPage() {
+      if (this.cycle < 0 || this.numCycles <= this.cycle) {
+        this.featureData = []
+      } else {
+        this.featureData = this.sim.featLayer[this.cycle]
+      }
     }
   },
-  components: { Config, Analysis }
+  components: { Config, SimulationPage, Analysis }
 }
 </script>
 
