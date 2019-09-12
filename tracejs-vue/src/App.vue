@@ -33,7 +33,7 @@
       <config :config="config" />
     </div>
     <div v-if="activeTab == 1" style="display: flex; flex: 1 1 auto; min-height: 0;">
-      <simulation-page :featureData="featureData" />
+      <simulation-page :feature-data="featureData" :words="lexicon" :word-data="wordData" :input-data="inputData" :phonemes="phonemes" :phoneme-data="phonemeData" />
     </div>
     <div v-else-if="activeTab == 7" style="display: flex; flex: 1 1 auto; min-height: 0;">
       <analysis :chart-data="chartData" :config="analysisConfig" />
@@ -68,8 +68,13 @@ export default {
       cycle: -1,
       numCycles: 0,
       analysis: [],
+
+      // chart data
       chartData: { datasets: [] },
-      featureData: []
+      featureData: [],
+      wordData: [],
+      inputData: [],
+      phonemeData: []
     }
   },
   created() {
@@ -79,6 +84,12 @@ export default {
     this.sim = new TraceSim(JSON.parse(JSON.stringify(this.config)))
   },
   computed: {
+    phonemes() {
+      return (this.sim && this.sim.phonemes && this.sim.phonemes.sorted()) || []
+    },
+    lexicon() {
+      return (this.sim && this.sim.config && this.sim.config.lexicon) || []
+    },
     dat() {
       if (!this.sim || this.cycle < 0 || this.numCycles <= this.cycle)
         return ''
@@ -155,8 +166,14 @@ export default {
     updateSimPage() {
       if (this.cycle < 0 || this.numCycles <= this.cycle) {
         this.featureData = []
+        this.wordData = []
+        this.inputData = []
+        this.phonemeData = []
       } else {
         this.featureData = this.sim.featLayer[this.cycle]
+        this.wordData = this.sim.wordLayer[this.cycle]
+        this.inputData = this.sim.inputLayer[this.cycle]
+        this.phonemeData = this.sim.phonLayer[this.cycle]
       }
     }
   },
