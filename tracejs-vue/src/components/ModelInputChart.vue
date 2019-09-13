@@ -5,9 +5,10 @@
     x-axis-title="Time"
     y-axis-title="Feature Continua"
     :y-label-callback="yLabelCallback"
-    :num-x-ticks="100"
+    :num-x-ticks="simConfig.fSlices + 1"
     :num-y-ticks="63"
-    :y-step-size="9" />
+    :y-step-size="9"
+    :sim-config="simConfig" />
 </template>
 
 <script>
@@ -15,10 +16,8 @@ import SimulationChart from './SimulationChart.vue'
 
 export default {
   props: {
-    chartData: {
-      type: Array,
-      default: () => []
-    },
+    chartData: Array,
+    simConfig: Object
   },
   methods: {
     yLabelCallback(value, index) {
@@ -27,7 +26,7 @@ export default {
         return labels[index]
       }
       return null
-    } 
+    }
   },
   components: { SimulationChart }
 }

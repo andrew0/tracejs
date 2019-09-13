@@ -1,9 +1,9 @@
 <template>
   <div class="grid2x2">
-    <div class="grid-box"><feature-activations-chart :chart-data="featureData" class="chart-wrapper" /></div>
-    <div class="grid-box"><word-activations-chart :chart-data="wordData" :words="words" class="chart-wrapper" /></div>
-    <div class="grid-box"><model-input-chart :chart-data="inputData" class="chart-wrapper" /></div>
-    <div class="grid-box"><phoneme-activations-chart :chart-data="phonemeData" :phonemes="phonemes" class="chart-wrapper" /></div>
+    <div class="grid-box"><feature-activations-chart :chart-data="featureData" :sim-config="simConfig" class="chart-wrapper" /></div>
+    <div class="grid-box"><word-activations-chart :chart-data="wordData" :sim-config="simConfig"  class="chart-wrapper" /></div>
+    <div class="grid-box"><model-input-chart :chart-data="inputData" :sim-config="simConfig" class="chart-wrapper" /></div>
+    <div class="grid-box"><phoneme-activations-chart :chart-data="phonemeData" :sim-config="simConfig" :phonemes="phonemes" class="chart-wrapper" /></div>
   </div>
 </template>
 
@@ -15,30 +15,12 @@ import PhonemeActivationsChart from './PhonemeActivationsChart.vue'
 
 export default {
   props: {
-    featureData: {
-      type: Array,
-      default: () => []
-    },
-    words: {
-      type: Array,
-      default: () => []
-    },
-    wordData: {
-      type: Array,
-      default: () => []
-    },
-    inputData: {
-      type: Array,
-      default: () => []
-    },
-    phonemes: {
-      type: Array,
-      default: () => []
-    },
-    phonemeData: {
-      type: Array,
-      default: () => []
-    }
+    simConfig: Object,
+    phonemes: Array,
+    featureData: Array,
+    wordData: Array,
+    inputData: Array,
+    phonemeData: Array
   },
   components: { FeatureActivationsChart, WordActivationsChart, ModelInputChart, PhonemeActivationsChart }
 }

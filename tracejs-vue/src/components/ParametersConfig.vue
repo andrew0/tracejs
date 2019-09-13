@@ -21,8 +21,7 @@
     <parameter-config-input v-model="config.bias" label="Bias" note="Lexical bias" />
     <parameter-config-input v-model="config.spreadScale[0]" label="spreadScale" note="Scales FETSPREADs" />
     <parameter-config-input v-model="config.min" label="Min" note="Minimum activation" />
-    <parameter-config-input v-model="config.bias" label="Max" note="Maximum activation" />
-    <parameter-config-input v-model="config.bias" label="Bias" note="Lexical bias" />
+    <parameter-config-input v-model="config.max" label="Max" note="Maximum activation" />
     <parameter-config-input v-model="config.spread[0]" label="FETSPREAD[pow]" note="Power feature spread" />
     <parameter-config-input v-model="config.spread[1]" label="FETSPREAD[voc]" note="Vocalic feature spread" />
     <parameter-config-input v-model="config.spread[2]" label="FETSPREAD[dif]" note="Diffuse feature spread" />

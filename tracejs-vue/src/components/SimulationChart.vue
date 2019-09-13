@@ -7,17 +7,15 @@ import chartjsChartMatrix from 'chartjs-chart-matrix'
 export default {
   extends: generateChart('matrix', 'matrix'),
   props: {
-    chartData: {
-      type: Array,
-      default: () => []
-    },
+    chartData: Array,
     chartTitle: String,
     xAxisTitle: String,
     yAxisTitle: String,
     yLabelCallback: Function,
     numXTicks: Number,
     numYTicks: Number,
-    yStepSize: Number
+    yStepSize: Number,
+    simConfig: Object
   },
   data() {
     return {
@@ -57,10 +55,10 @@ export default {
             ticks: {
               display: true,
               min: 0,
-              max: this.yStepSize && this.yStepSize > 1 ? this.numYTicks - 1 : this.numYTicks,
+              max: this.numYTicks, // don't subtract 1, chart needs extra tick on top in order to center labels
               stepSize: this.yStepSize || 1,
               callback: this.yLabelCallback || (value => value),
-              fontColor: 'transparent'
+              fontColor: 'transparent' // original labels transparent, plugin will draw centered labels
             },
             gridLines: {
               display: true
@@ -80,11 +78,8 @@ export default {
     }
   },
   mounted() {
+    // center Y axis labels
     this.addPlugin({
-      beforeDraw: chart => {
-        // hide original tick
-        chart.scales['y-axis-0'].options.ticks.fontColor = 'transparent'
-      },
       afterDraw: chart => {
         const ctx = chart.ctx
         const yAxis = chart.scales['y-axis-0']
@@ -112,9 +107,12 @@ export default {
       const data = []
       for (const [y, row] of this.chartData.entries()) {
         for (const [x, val] of row.entries()) {
-          const v = Math.min(Math.max(val, 0), 1.0)
-          if (v > 0) {
-            data.push({ x: x + 0.5, y: this.numYTicks - 0.5 - y, v })
+          if (val > 0) {
+            data.push({
+              x: x + 0.5,
+              y: this.numYTicks - 0.5 - y,
+              v: (Math.min(Math.max(val, 0), 1.0) - this.simConfig.min) / (this.simConfig.max - this.simConfig.min)
+            })
           }
         }
       }
@@ -124,6 +122,9 @@ export default {
           label: 'My Matrix',
           data,
           backgroundColor: ctx => {
+            // jTRACE does it like this:
+            // const value = 255 - ctx.dataset.data[ctx.dataIndex].v * 255
+            // return `rgba(${value}, ${value}, ${value}, 1)`
             const value = ctx.dataset.data[ctx.dataIndex].v
             return `rgba(0, 0, 0, ${value})`
           },

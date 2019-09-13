@@ -5,9 +5,10 @@
     x-axis-title="Temporal Alignment"
     y-axis-title="Phoneme"
     :y-label-callback="yLabelCallback"
-    :num-x-ticks="33"
+    :num-x-ticks="Math.ceil(simConfig.fSlices / simConfig.slicesPerPhon) + 1"
     :num-y-ticks="phonemes.length"
-    :y-step-size="1" />
+    :y-step-size="1"
+    :sim-config="simConfig" />
 </template>
 
 <script>
@@ -15,10 +16,8 @@ import SimulationChart from './SimulationChart.vue'
 
 export default {
   props: {
-    chartData: {
-      type: Array,
-      default: () => []
-    },
+    chartData: Array,
+    simConfig: Object,
     phonemes: Array
   },
   methods: {
@@ -27,7 +26,7 @@ export default {
         return this.phonemes[index].label
       }
       return null
-    } 
+    }
   },
   components: { SimulationChart }
 }

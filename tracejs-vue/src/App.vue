@@ -33,7 +33,7 @@
       <config :config="config" />
     </div>
     <div v-if="activeTab == 1" style="display: flex; flex: 1 1 auto; min-height: 0;">
-      <simulation-page :feature-data="featureData" :words="lexicon" :word-data="wordData" :input-data="inputData" :phonemes="phonemes" :phoneme-data="phonemeData" />
+      <simulation-page :sim-config="config" :phonemes="phonemes" :feature-data="featureData" :word-data="wordData" :input-data="inputData" :phoneme-data="phonemeData" />
     </div>
     <div v-else-if="activeTab == 7" style="display: flex; flex: 1 1 auto; min-height: 0;">
       <analysis :chart-data="chartData" :config="analysisConfig" />
