@@ -32,7 +32,7 @@
     <div v-if="activeTab == 0" style="display: flex; flex: 1 1 auto;">
       <config :config="config" />
     </div>
-    <div v-if="activeTab == 1" style="display: flex; flex: 1 1 auto; min-height: 0;">
+    <div v-else-if="activeTab == 1" style="display: flex; flex: 1 1 auto; min-height: 0;">
       <simulation-page :sim-config="config" :phonemes="phonemes" :feature-data="featureData" :word-data="wordData" :input-data="inputData" :phoneme-data="phonemeData" />
     </div>
     <div v-else-if="activeTab == 7" style="display: flex; flex: 1 1 auto; min-height: 0;">
