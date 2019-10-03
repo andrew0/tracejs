@@ -5,7 +5,7 @@ import { generateChart } from 'vue-chartjs'
 import chartjsChartMatrix from 'chartjs-chart-matrix'
 
 export default {
-  extends: generateChart('matrix', 'matrix'),
+  extends: generateChart('matrix-chart', 'matrix'),
   props: {
     chartData: Array,
     chartTitle: String,

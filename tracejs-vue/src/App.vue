@@ -13,27 +13,28 @@
         </div>
       </section>
 
-      <section v-if="activeTab != 0" style="padding: 0.5rem;">
-        <a class="button" @click="run">Run</a>
-
-        <span v-if="[1, 2 , 3, 4].indexOf(activeTab) >= 0" style="margin-left: 2rem;">
-          cycle:
-          <a class="button" @click="cycle = clamp(cycle - 1, 0, numCycles - 1)">-</a>
-          <div class="select">
-            <select v-model="cycle">
-              <option v-for="(n, index) in numCycles" :key="index" :value="index">{{ index }}</option>
-            </select>
-          </div>
-          <a class="button" @click="cycle = clamp(cycle + 1, 0, numCycles - 1)">+</a>
-        </span>
-      </section>
+      <simulation-toolbar
+        v-if="activeTab != 0"
+        @run="run"
+        :cycle.sync="cycle"
+        :num-cycles="numCycles"
+        :show-cycles="[1, 2 , 3, 4].indexOf(activeTab) >= 0"
+        :visualize.sync="showVisualizations"
+        :show-chart-options="activeTab == 1" />
     </div>
 
     <div v-if="activeTab == 0" style="display: flex; flex: 1 1 auto;">
       <config :config="config" />
     </div>
     <div v-else-if="activeTab == 1" style="display: flex; flex: 1 1 auto; min-height: 0;">
-      <simulation-page :sim-config="config" :phonemes="phonemes" :feature-data="featureData" :word-data="wordData" :input-data="inputData" :phoneme-data="phonemeData" />
+      <simulation-page
+        :sim-config="config"
+        :phonemes="phonemes"
+        :feature-data="featureData"
+        :word-data="wordData"
+        :input-data="inputData"
+        :phoneme-data="phonemeData"
+        :visualize="showVisualizations" />
     </div>
     <div v-else-if="activeTab == 7" style="display: flex; flex: 1 1 auto; min-height: 0;">
       <analysis :chart-data="chartData" :config="analysisConfig" />
@@ -44,6 +45,7 @@
 
 <script>
 import { TraceSim, createDefaultConfig, doSimAnalysis, TraceDomain, TraceCalculationType, TraceChoice } from 'tracejs'
+import SimulationToolbar from './components/SimulationToolbar.vue'
 import Config from './components/Config.vue'
 import SimulationPage from './components/SimulationPage.vue'
 import Analysis from './components/Analysis.vue'
@@ -74,7 +76,9 @@ export default {
       featureData: [],
       wordData: [],
       inputData: [],
-      phonemeData: []
+      phonemeData: [],
+
+      showVisualizations: false
     }
   },
   created() {
@@ -177,7 +181,7 @@ export default {
       }
     }
   },
-  components: { Config, SimulationPage, Analysis }
+  components: { SimulationToolbar, Config, SimulationPage, Analysis }
 }
 </script>
 

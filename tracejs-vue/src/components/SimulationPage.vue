@@ -1,13 +1,17 @@
 <template>
   <div class="grid2x2">
     <div class="grid-box"><feature-activations-chart :chart-data="featureData" :sim-config="simConfig" class="chart-wrapper" /></div>
-    <div class="grid-box"><word-activations-chart :chart-data="wordData" :sim-config="simConfig"  class="chart-wrapper" /></div>
+    <div class="grid-box">
+      <word-box-chart v-if="visualize" :chart-data="wordData" :sim-config="simConfig"  class="chart-wrapper" />
+      <word-activations-chart v-else :chart-data="wordData" :sim-config="simConfig"  class="chart-wrapper" />
+    </div>
     <div class="grid-box"><model-input-chart :chart-data="inputData" :sim-config="simConfig" class="chart-wrapper" /></div>
     <div class="grid-box"><phoneme-activations-chart :chart-data="phonemeData" :sim-config="simConfig" :phonemes="phonemes" class="chart-wrapper" /></div>
   </div>
 </template>
 
 <script>
+import WordBoxChart from './WordBoxChart.vue'
 import FeatureActivationsChart from './FeatureActivationsChart.vue'
 import WordActivationsChart from './WordActivationsChart.vue'
 import ModelInputChart from './ModelInputChart.vue'
@@ -20,9 +24,10 @@ export default {
     featureData: Array,
     wordData: Array,
     inputData: Array,
-    phonemeData: Array
+    phonemeData: Array,
+    visualize: Boolean
   },
-  components: { FeatureActivationsChart, WordActivationsChart, ModelInputChart, PhonemeActivationsChart }
+  components: { WordBoxChart, FeatureActivationsChart, WordActivationsChart, ModelInputChart, PhonemeActivationsChart }
 }
 </script>
 
