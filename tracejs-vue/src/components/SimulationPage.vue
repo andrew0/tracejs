@@ -6,12 +6,16 @@
       <word-activations-chart v-else :chart-data="wordData" :sim-config="simConfig"  class="chart-wrapper" />
     </div>
     <div class="grid-box"><model-input-chart :chart-data="inputData" :sim-config="simConfig" class="chart-wrapper" /></div>
-    <div class="grid-box"><phoneme-activations-chart :chart-data="phonemeData" :sim-config="simConfig" :phonemes="phonemes" class="chart-wrapper" /></div>
+    <div class="grid-box">
+      <phoneme-box-chart v-if="visualize" :chart-data="phonemeData" :sim-config="simConfig" :phonemes="phonemes" class="chart-wrapper" />
+      <phoneme-activations-chart v-else :chart-data="phonemeData" :sim-config="simConfig" :phonemes="phonemes" class="chart-wrapper" />
+    </div>
   </div>
 </template>
 
 <script>
 import WordBoxChart from './WordBoxChart.vue'
+import PhonemeBoxChart from './PhonemeBoxChart.vue'
 import FeatureActivationsChart from './FeatureActivationsChart.vue'
 import WordActivationsChart from './WordActivationsChart.vue'
 import ModelInputChart from './ModelInputChart.vue'
@@ -27,7 +31,7 @@ export default {
     phonemeData: Array,
     visualize: Boolean
   },
-  components: { WordBoxChart, FeatureActivationsChart, WordActivationsChart, ModelInputChart, PhonemeActivationsChart }
+  components: { WordBoxChart, PhonemeBoxChart, FeatureActivationsChart, WordActivationsChart, ModelInputChart, PhonemeActivationsChart }
 }
 </script>
 

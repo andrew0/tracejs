@@ -24,7 +24,11 @@ export default {
     xAxisTitle: String,
     yAxisTitle: String,
     numXTicks: Number,
-    simConfig: Object
+    simConfig: Object,
+    borderWidth: {
+      type: Number,
+      default: 1.0
+    }
   },
   data() {
     return {
@@ -95,7 +99,7 @@ export default {
           data: this.chartData,
           backgroundColor: () => 'transparent',
           borderColor: ctx => colorPalette[ctx.dataIndex % colorPalette.length],
-          borderWidth: () => 1.0,
+          borderWidth: () => this.borderWidth,
           width: ctx => {
             const { right, left } = ctx.chart.chartArea
             return (right - left) / this.options.scales.xAxes[0].ticks.max * 5
