@@ -2,9 +2,10 @@
   "name": "tracejs",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "build": "tsc",
     "test": "jest"
   },
   "author": "",
