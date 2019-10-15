@@ -3,7 +3,7 @@
     "module": "commonjs",
     "declaration": true,
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "es2017",
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "lib"
@@ -12,5 +12,5 @@
     "src/**/__tests__/*",
     "lib"
   ],
-  "lib": ["es2015"]
+  "lib": ["es2017"]
 }
