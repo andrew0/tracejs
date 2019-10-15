@@ -2,6 +2,7 @@
   "name": "tracejs",
   "version": "1.0.0",
   "description": "",
+  "bin": { "tracejs": "bin/app.js" },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
