@@ -9,7 +9,8 @@
     "outDir": "lib"
   },
   "exclude": [
-    "src/**/__tests__/*"
+    "src/**/__tests__/*",
+    "lib"
   ],
   "lib": ["es2015"]
 }
