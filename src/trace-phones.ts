@@ -141,12 +141,12 @@ export default class TracePhones {
 
     const incr_phon = []
     for (let cont = 0; cont < NUM_FEATURES * CONTINUA_PER_FEATURE; cont++) {
-      incr_phon[cont] = (phon_to.features[cont] - phon_from.features[cont]) / (this.ambiguousPhonemes.length - 1)
+      incr_phon[cont] = (phon_to.features[cont] - phon_from.features[cont]) / (steps - 1)
     }
 
     const incr_dur = []
     for (let cont = 0; cont < CONTINUA_PER_FEATURE; cont++) {
-      incr_dur[cont] = (phon_to.durationScalar[cont] - phon_from.durationScalar[cont]) - (this.ambiguousPhonemes.length - 1)
+      incr_dur[cont] = (phon_to.durationScalar[cont] - phon_from.durationScalar[cont]) / (steps - 1)
     }
 
     // now create the ambiguous phoneme arrays, i.e. the data used to create the phon objects
