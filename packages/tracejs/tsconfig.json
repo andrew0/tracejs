@@ -6,11 +6,8 @@
     "target": "es2017",
     "moduleResolution": "node",
     "sourceMap": true,
+    "rootDir": "src",
     "outDir": "lib"
   },
-  "exclude": [
-    "src/**/__tests__/*",
-    "lib"
-  ],
   "lib": ["es2017"]
 }

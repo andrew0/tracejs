@@ -48,14 +48,17 @@ export default class TracePhones {
   }
 
   public byLabel(label: string): TracePhoneInternal {
-    return this.phonemes.find(x => x.label == label) || this.ambiguousPhonemes.find(x => x.label == label)
+    return (
+      this.phonemes.find((x) => x.label == label) ||
+      this.ambiguousPhonemes.find((x) => x.label == label)
+    )
   }
 
   /**
    * Spreads the phonesmes over time according to the spread array. This
    * should be run before a TraceSim is run, and after any change to the
    * ambiguous phoneme information.
-   * 
+   *
    * @param spread        spread[] in TraceParam
    * @param scale         spreadScale[] in TraceParam
    * @param min           min in TraceParam
@@ -102,15 +105,17 @@ export default class TracePhones {
             const spreadSteps = Math.floor(cont / NUM_FEATURES)
 
             // delta is the amount to ramp up/down
-            const delta = ((phon.features[cont] * max) - (phon.features[cont] * min)) / (spread[spreadSteps] * phon.durationScalar[0])
+            const delta =
+              (phon.features[cont] * max - phon.features[cont] * min) /
+              (spread[spreadSteps] * phon.durationScalar[0])
 
             const n = Math.floor(spread[spreadSteps] * phon.durationScalar[0])
             for (let i = 0; i < n; i++) {
               // compute spread (should these be the same?)
-              phon.spread[cont][phon.spreadOffset+i] = (phon.features[cont] * max) - (delta * i)
-              phon.spread[cont][phon.spreadOffset-i] = phon.spread[cont][phon.spreadOffset+i]
+              phon.spread[cont][phon.spreadOffset + i] = phon.features[cont] * max - delta * i
+              phon.spread[cont][phon.spreadOffset - i] = phon.spread[cont][phon.spreadOffset + i]
               // and normalization info
-              phon.norm += 2*Math.pow(phon.spread[cont][phon.spreadOffset+i], 2)
+              phon.norm += 2 * Math.pow(phon.spread[cont][phon.spreadOffset + i], 2)
             }
           }
         }
@@ -156,21 +161,21 @@ export default class TracePhones {
       const features: number[] = []
       for (let cont = 0; cont < NUM_FEATURES * CONTINUA_PER_FEATURE; cont++) {
         // continuum value is calculated as ith step in cont difference between ambigFrom to ambigTo:
-        features[cont] = phon_from.features[cont] + (i * incr_phon[cont])
+        features[cont] = phon_from.features[cont] + i * incr_phon[cont]
       }
 
       const durationScalar: number[] = []
       for (let cont = 0; cont < CONTINUA_PER_FEATURE; cont++) {
         // continuum value is calculated as ith step in cont difference between ambigFrom to ambigTo:
-        durationScalar[cont] = phon_from.durationScalar[cont] + (i * incr_dur[cont])
+        durationScalar[cont] = phon_from.durationScalar[cont] + i * incr_dur[cont]
       }
-      
+
       // create the ambiguous phoneme
       this.ambiguousPhonemes.push({
         label: i.toString(),
         features,
         durationScalar,
-        phonologicalRole: TracePhoneRole.AMBIG
+        phonologicalRole: TracePhoneRole.AMBIG,
       })
     }
 
@@ -180,7 +185,7 @@ export default class TracePhones {
       label: '?',
       features: [...this.ambiguousPhonemes[midpoint].features],
       durationScalar: [...this.ambiguousPhonemes[midpoint].durationScalar],
-      phonologicalRole: TracePhoneRole.AMBIG
+      phonologicalRole: TracePhoneRole.AMBIG,
     })
 
     // sort phonemes

@@ -1,9 +1,8 @@
 import { RdlNode } from './trace-param'
 
-
 /* Acts as interface for calling up different hypothetical frequency effects
  * that may be applied at different points during a TRACE simulation.
- * Also may act as an interface between the TRACE model and lexicon if the 
+ * Also may act as an interface between the TRACE model and lexicon if the
  * lexical model requires such interactions.  For example, if an instance of
  * lexical access by the model led to a modification of a lexical representation.
  * See: https://web.archive.org/web/20190510040859/https://www.sas.upenn.edu/psych/dahanlab/PDFFiles/dahanCgPsy01.pdf */

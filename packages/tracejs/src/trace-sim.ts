@@ -17,7 +17,10 @@ export default class TraceSim {
   constructor(public config: TraceConfig = createDefaultConfig()) {
     this.tn = new TraceNet(this.config)
     this.phonemes = this.tn.phonemes
-    this.maxDuration = Math.max(6 * this.config.modelInput.length * this.config.deltaInput, this.config.fSlices)
+    this.maxDuration = Math.max(
+      6 * this.config.modelInput.length * this.config.deltaInput,
+      this.config.fSlices
+    )
   }
 
   public getStepsRun(): number {

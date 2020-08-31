@@ -1,0 +1,27 @@
+{
+  "name": "tracejs",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "author": "",
+  "description": "",
+  "bin": {
+    "tracejs": "bin/cli.js"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "bin",
+    "lib/**/*.js"
+  ],
+  "scripts": {
+    "build": "rm -rf lib && tsc -p .",
+    "fmt": "prettier --parser=typescript --write src/**/*.ts"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^3.17.4"
+  },
+  "devDependencies": {
+    "prettier": "^2.1.1",
+    "typescript": "~3.9.0"
+  }
+}
