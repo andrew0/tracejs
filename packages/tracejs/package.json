@@ -7,14 +7,17 @@
   "bin": {
     "tracejs": "bin/cli.js"
   },
-  "main": "lib/index.js",
+  "main": "dist/common/index.js",
+  "module": "dist/esm/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "bin",
-    "lib/**/*.js"
+    "dist/**/*.js"
   ],
   "scripts": {
-    "build": "rm -rf lib && tsc -p .",
+    "build:common": "tsc --outDir dist/common --esModuleInterop --module commonjs -p .",
+    "build:esm": "tsc --outDir dist/esm --allowSyntheticDefaultImports --module esnext -p .",
+    "build": "yarn build:common && yarn build:esm",
     "fmt": "prettier --parser=typescript --write src/**/*.ts"
   },
   "dependencies": {
