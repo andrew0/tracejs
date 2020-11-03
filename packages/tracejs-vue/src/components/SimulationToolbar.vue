@@ -22,6 +22,10 @@
         Visualize word/phoneme activations
       </label>
     </span>
+
+    <span v-if="showDownloadButton" class="is-pulled-right">
+      <a class="button" @click="$emit('save-data')">Save data</a>
+    </span>
   </section>
 </template>
 
@@ -33,6 +37,7 @@ export default {
     numCycles: Number,
     showCycles: Boolean,
     showChartOptions: Boolean,
+    showDownloadButton: Boolean,
     visualize: Boolean
   },
   data() {

@@ -16,12 +16,14 @@
       <simulation-toolbar
         v-if="activeTab != 0"
         @run="run"
+        @save-data="saveData"
         :cycle.sync="cycle"
         :cycles-to-run.sync="cyclesToRun"
         :num-cycles="numCycles"
         :show-cycles="[1, 2 , 3, 4].indexOf(activeTab) >= 0"
         :visualize.sync="showVisualizations"
-        :show-chart-options="activeTab == 1" />
+        :show-chart-options="activeTab == 1"
+        :show-download-button="activeTab > 1 && activeTab < 7" />
     </div>
 
     <div v-if="activeTab == 0" style="display: flex; flex: 1 1 auto;">
@@ -50,6 +52,8 @@ import SimulationToolbar from './components/SimulationToolbar.vue'
 import Config from './components/Config.vue'
 import SimulationPage from './components/SimulationPage.vue'
 import Analysis from './components/Analysis.vue'
+import FileSaver from 'file-saver'
+import JSZip from '@progress/jszip-esm'
 
 const chartColors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#000000']
 
@@ -97,31 +101,7 @@ export default {
       return (this.sim && this.sim.config && this.sim.config.lexicon) || []
     },
     dat() {
-      if (!this.sim || this.cycle < 0 || this.numCycles <= this.cycle)
-        return ''
-
-      switch (this.activeTab) {
-        case 2:
-          return this.sim.inputLayer[this.cycle]
-            .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join('\t'))
-            .join('\n')
-        case 3:
-          return this.sim.featLayer[this.cycle]
-            .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join('\t'))
-            .join('\n')
-        case 4:
-          return this.sim.phonLayer[this.cycle]
-            .map((row, index) => [this.sim.phonemes && this.sim.phonemes.byIndex(index).label, ...row.map(x => x.toFixed(4))].join('\t'))
-            .join('\n')
-        case 5:
-          return this.sim.wordLayer[this.cycle]
-            .map((row, index) => [this.sim.config.lexicon[index].phon, ...row.map(x => x.toFixed(4))].join('\t'))
-            .join('\n')
-        case 6:
-          return this.analysisData
-        default:
-          return ''
-      }
+      return this.getData(this.activeTab, this.cycle, '\t')
     },
     analysisData() {
       return formatAnalysis(this.chartData.datasets, true)
@@ -174,6 +154,48 @@ export default {
         this.wordData = this.sim.wordLayer[this.cycle]
         this.inputData = this.sim.inputLayer[this.cycle]
         this.phonemeData = this.sim.phonLayer[this.cycle]
+      }
+    },
+    async saveData() {
+      const zip = new JSZip()
+      const input = zip.folder('input')
+      const feature = zip.folder('feature')
+      const phoneme = zip.folder('phoneme')
+      const word = zip.folder('word')
+      for (let i = 0; i < this.numCycles; i++) {
+        input.file(`${i.toString().padStart(4, '0')}.dat`, this.getData(2, i, ', '))
+        feature.file(`${i.toString().padStart(4, '0')}.dat`, this.getData(3, i, ', '))
+        phoneme.file(`${i.toString().padStart(4, '0')}.dat`, this.getData(4, i, ', '))
+        word.file(`${i.toString().padStart(4, '0')}.dat`, this.getData(5, i, ', '))
+      }
+      zip.file('analysis.dat', this.getData(6, 0, ', '))
+      FileSaver.saveAs(await zip.generateAsync({type: 'blob'}), 'tracejs-sim.zip')
+    },
+    getData(tab, cycle, separator) {
+      if (!this.sim || this.cycle < 0 || this.numCycles <= this.cycle)
+        return ''
+
+      switch (tab) {
+        case 2:
+          return this.sim.inputLayer[cycle]
+            .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join(separator))
+            .join('\n')
+        case 3:
+          return this.sim.featLayer[cycle]
+            .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join(separator))
+            .join('\n')
+        case 4:
+          return this.sim.phonLayer[cycle]
+            .map((row, index) => [this.sim.phonemes && this.sim.phonemes.byIndex(index).label, ...row.map(x => x.toFixed(4))].join(separator))
+            .join('\n')
+        case 5:
+          return this.sim.wordLayer[cycle]
+            .map((row, index) => [this.sim.config.lexicon[index].phon, ...row.map(x => x.toFixed(4))].join(separator))
+            .join('\n')
+        case 6:
+          return this.analysisData
+        default:
+          return ''
       }
     }
   },

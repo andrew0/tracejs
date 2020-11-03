@@ -6,6 +6,7 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@progress/jszip-esm": "^1.0.2",
     "chart.js": "~2.8.0",
     "file-saver": "^2.0.2",
     "tracejs": "*",
