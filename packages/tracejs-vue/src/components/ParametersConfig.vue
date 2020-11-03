@@ -43,8 +43,10 @@ import ParameterConfigInput from './ParameterConfigInput.vue'
 
 export default {
   props: {
-    config: Object,
-    default: () => ({})
+    config: {
+      type: Object,
+      default: () => ({})
+    },
   },
   components: { ParameterConfigInput }
 }

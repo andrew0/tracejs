@@ -17,6 +17,7 @@
         v-if="activeTab != 0"
         @run="run"
         :cycle.sync="cycle"
+        :cycles-to-run.sync="cyclesToRun"
         :num-cycles="numCycles"
         :show-cycles="[1, 2 , 3, 4].indexOf(activeTab) >= 0"
         :visualize.sync="showVisualizations"
@@ -68,6 +69,7 @@ export default {
         kValue: 0
       },
       cycle: -1,
+      cyclesToRun: 60,
       numCycles: 0,
       analysis: [],
 
@@ -136,7 +138,7 @@ export default {
       console.time('trace.js')
       this.sim = new TraceSim(JSON.parse(JSON.stringify(this.config)))
 
-      this.sim.cycle(60)
+      this.sim.cycle(this.cyclesToRun)
       this.numCycles = this.sim.getStepsRun()
       this.cycle = this.clamp(this.cycle, 0, this.numCycles)
 

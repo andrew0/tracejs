@@ -1,6 +1,8 @@
 <template>
   <section style="padding: 0.5rem;">
-    <a class="button" @click="$emit('run')">Run</a>
+    Cycles to Calculate
+    <input class="input" type="text" :value="cyclesToRun" @input="$emit('update:cyclesToRun', $event.target.value)" style="width: 50px;" />
+    <a class="button" @click="$emit('run')">Calculate</a>
 
     <span v-if="showCycles" style="margin-left: 2rem;">
       cycle:
@@ -11,7 +13,7 @@
         </select>
       </div>
       <a class="button" @click="$emit('update:cycle', Math.min(Math.max(cycle + 1, 0), numCycles - 1))">+</a>
-      <a style="margin-left: 1rem;" class="button" @click="toggleTimer">{{ timer == null ? 'start' : 'stop' }}</a>
+      <a style="margin-left: 1rem;" class="button" @click="toggleTimer">{{ timer == null ? 'start animation' : 'stop animation' }}</a>
     </span>
 
     <span v-if="showChartOptions" style="margin-left: 2rem;">
@@ -27,6 +29,7 @@
 export default {
   props: {
     cycle: Number,
+    cyclesToRun: Number,
     numCycles: Number,
     showCycles: Boolean,
     showChartOptions: Boolean,

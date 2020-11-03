@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "chart.js": "~2.8.0",
+    "file-saver": "^2.0.2",
     "tracejs": "*",
     "vue": "^2.6.12",
     "vue-chartjs": "^3.5.1"
