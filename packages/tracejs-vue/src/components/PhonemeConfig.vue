@@ -1,73 +1,82 @@
 <template>
-  <div class="columns">
-    <div class="column is-2">
-      <div class="list is-hoverable">
-        <a
-          v-for="(phoneme, index) in sortedPhonemes"
-          :key="index"
-          :class="{ 'list-item': true, 'is-active': phoneme === activePhoneme }"
-          @click="activePhoneme = phoneme">
-          {{ phoneme.label || 'null' }}
-        </a>
-      </div>
-      <a class="button" @click="addPhoneme">Add phoneme</a>
-      <a class="button" @click="deleteSelected">Delete selected</a>
+  <div>
+    <div style="display: flex; margin-bottom: 1rem;">
+      <file-upload @load="loadJtPhonology" style="margin-right: 0.5rem;" />
+      <a class="button" @click="savePhonology">Save lexicon</a>
     </div>
-    <div v-if="activePhoneme" class="column">
-      <div class="field is-horizontal" style="width: 8rem;">
-        <div class="field-label">
-          <label class="label">Label</label>
+    <div class="columns">
+      <div class="column is-2">
+        <div class="list is-hoverable">
+          <a
+            v-for="(phoneme, index) in sortedPhonemes"
+            :key="index"
+            :class="{ 'list-item': true, 'is-active': phoneme === activePhoneme }"
+            @click="activePhoneme = phoneme">
+            {{ phoneme.label || 'null' }}
+          </a>
         </div>
-        <div class="field-body">
-          <input class="input" type="text" v-model="activePhoneme.label" />
-        </div>
+        <a class="button" @click="addPhoneme">Add phoneme</a>
+        <a class="button" @click="deleteSelected">Delete selected</a>
       </div>
+      <div v-if="activePhoneme" class="column">
+        <div class="field is-horizontal" style="width: 8rem;">
+          <div class="field-label">
+            <label class="label">Label</label>
+          </div>
+          <div class="field-body">
+            <input class="input" type="text" v-model="activePhoneme.label" />
+          </div>
+        </div>
 
-      <h1 class="title is-5 is-marginless">Phoneme Specification</h1>
-      <table class="table is-bordered">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th v-for="(cont, index) of continua" :key="index">
-              {{ cont }}
-            </th>
-         </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(feat, featIndex) in numFeatures" :key="featIndex">
-            <td>{{ feat }}</td>
-            <td v-for="(_, contIndex) in continua.length" :key="contIndex" class="is-paddingless">
-              <input class="borderless-input" style="width: 5rem;" type="text" v-model="activePhoneme.features[contIndex * numFeatures + featIndex]" />
-            </td>
+        <h1 class="title is-5 is-marginless">Phoneme Specification</h1>
+        <table class="table is-bordered">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th v-for="(cont, index) of continua" :key="index">
+                {{ cont }}
+              </th>
           </tr>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <tr v-for="(feat, featIndex) in numFeatures" :key="featIndex">
+              <td>{{ feat }}</td>
+              <td v-for="(_, contIndex) in continua.length" :key="contIndex" class="is-paddingless">
+                <input class="borderless-input" style="width: 5rem;" type="text" v-model="activePhoneme.features[contIndex * numFeatures + featIndex]" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-      <h1 class="title is-5 is-marginless">Duration Scalar</h1>
-      <table class="table is-bordered">
-        <thead>
-          <tr>
-            <th v-for="(cont, index) of continua" :key="index">
-              {{ cont }}
-            </th>
-         </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td v-for="(_, contIndex) in continua.length" :key="contIndex" class="is-paddingless">
-              <input class="borderless-input" style="width: 5rem;" type="text" v-model="activePhoneme.durationScalar[contIndex]" />
-            </td>
+        <h1 class="title is-5 is-marginless">Duration Scalar</h1>
+        <table class="table is-bordered">
+          <thead>
+            <tr>
+              <th v-for="(cont, index) of continua" :key="index">
+                {{ cont }}
+              </th>
           </tr>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <tr>
+              <td v-for="(_, contIndex) in continua.length" :key="contIndex" class="is-paddingless">
+                <input class="borderless-input" style="width: 5rem;" type="text" v-model="activePhoneme.durationScalar[contIndex]" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { createDefaultPhoneme } from 'tracejs'
+import FileUpload from './FileUpload.vue'
+import { createDefaultPhoneme, parseJtPhonology, serializeJtPhonology } from 'tracejs'
+import FileSaver from 'file-saver'
 
 export default {
+  components: { FileUpload },
   props: {
     phonemes: {
       type: Array,
@@ -99,7 +108,15 @@ export default {
       const phoneme = createDefaultPhoneme()
       this.phonemes.push(phoneme)
       this.activePhoneme = phoneme
-    }
+    },
+    loadJtPhonology(xmlText) {
+      // replace the configuration in place
+      this.phonemes.splice(0, this.phonemes.length, ...parseJtPhonology(xmlText))
+    },
+    savePhonology() {
+      const blob = new Blob([serializeJtPhonology(this.phonemes)], {type: 'application/xml'})
+      FileSaver.saveAs(blob, 'phonology.jt')
+    },
   },
   computed: {
     sortedPhonemes() {
