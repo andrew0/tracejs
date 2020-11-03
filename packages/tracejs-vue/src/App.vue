@@ -20,10 +20,10 @@
         :cycle.sync="cycle"
         :cycles-to-run.sync="cyclesToRun"
         :num-cycles="numCycles"
-        :show-cycles="[1, 2 , 3, 4].indexOf(activeTab) >= 0"
+        :show-cycles="activeTab > 0 && activeTab < 6"
         :visualize.sync="showVisualizations"
         :show-chart-options="activeTab == 1"
-        :show-download-button="activeTab > 1 && activeTab < 7" />
+        :show-download-button="activeTab > 0 && activeTab < 7" />
     </div>
 
     <div v-if="activeTab == 0" style="display: flex; flex: 1 1 auto;">
