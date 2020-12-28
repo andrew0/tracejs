@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div class="field">
+    <div v-if="shouldShowItems" class="field">
       <label class="label">Items</label>
       <div class="control">
         <label class="radio">
@@ -69,30 +69,48 @@
     </div>
 
     <div v-if="shouldShowLuceChoice" class="field">
-      <div class="field">
-        <label class="label">Luce Choice</label>
-        <div class="control">
-          <label class="radio">
-            <input type="radio" name="choice" :value="choiceNormal" v-model="config.choice" />
-            All Items
-          </label>
-          <label class="radio">
-            <input type="radio" name="choice" :value="choiceForced" v-model="config.choice" />
-            Forced Choice
-          </label>
-        </div>
-        <br />
-        <label>
-          K Value
-          <input class="input" min="0" type="number" v-model="config.kValue" style="width: 50px;" />
+      <label class="label">Luce Choice</label>
+      <div class="control">
+        <label class="radio">
+          <input type="radio" name="choice" :value="choiceNormal" v-model="config.choice" />
+          All Items
         </label>
+        <label class="radio">
+          <input type="radio" name="choice" :value="choiceForced" v-model="config.choice" />
+          Forced Choice
+        </label>
+      </div>
+      <br />
+      <label>
+        K Value
+        <input class="input" min="0" type="number" v-model="config.kValue" style="width: 50px;" />
+      </label>
+    </div>
+
+    <div v-if="shouldShowCompetIndex" class="field">
+      <label class="label">Global Competition Index</label>
+      <div class="control">
+        <div class="select">
+          <select v-model="config.competType">
+            <option :value="competTypeRaw">Raw</option>
+            <option :value="competTypeFirstDeriv">1st Derivative</option>
+            <option :value="competTypeSecondDeriv">2nd Derivative</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="shouldShowCompetSlope" class="field">
+      <label class="label">Sampling Width</label>
+      <div class="control">
+        <input class="input" min="2" type="number" v-model="config.competSlope" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { TraceDomain, TraceContentType, TraceCalculationType, TraceChoice } from 'tracejs'
+import { TraceDomain, TraceContentType, TraceCalculationType, TraceCompetitionType, TraceChoice } from 'tracejs'
 
 export default {
   props: {
@@ -114,6 +132,10 @@ export default {
       contentTypeResponseProbabilities: TraceContentType.RESPONSE_PROBABILITIES,
       contentTypeActivations: TraceContentType.ACTIVATIONS,
       contentTypeCompetitionIndex: TraceContentType.COMPETITION_INDEX,
+
+      competTypeRaw: TraceCompetitionType.RAW,
+      competTypeFirstDeriv: TraceCompetitionType.FIRST_DERIVATIVE,
+      competTypeSecondDeriv: TraceCompetitionType.SECOND_DERIVATIVE,
 
       choiceNormal: TraceChoice.NORMAL,
       choiceForced: TraceChoice.FORCED,
@@ -137,11 +159,21 @@ export default {
     },
     shouldShowAlignment() {
       const { calculationType } = this.config;
-      return calculationType === TraceCalculationType.FRAUENFELDER
-        || calculationType === TraceCalculationType.STATIC;
+      return this.shouldShowAlignmentCalc &&
+        (calculationType === TraceCalculationType.FRAUENFELDER
+          || calculationType === TraceCalculationType.STATIC);
     },
     shouldShowLuceChoice() {
       return this.contentType === TraceContentType.RESPONSE_PROBABILITIES;
+    },
+    shouldShowItems() {
+      return this.contentType !== TraceContentType.COMPETITION_INDEX;
+    },
+    shouldShowCompetIndex() {
+      return this.contentType === TraceContentType.COMPETITION_INDEX;
+    },
+    shouldShowCompetSlope() {
+      return this.shouldShowCompetIndex && this.config.competType !== TraceCompetitionType.RAW;
     },
     contentType: {
       get: function() {

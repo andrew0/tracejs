@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { TraceSim, createDefaultConfig, doSimAnalysis, formatAnalysis, TraceDomain, TraceCalculationType, TraceChoice } from 'tracejs'
+import { TraceSim, createDefaultConfig, doSimAnalysis, formatAnalysis, TraceDomain, TraceCalculationType, TraceChoice, TraceCompetitionType } from 'tracejs'
 import SimulationToolbar from './components/SimulationToolbar.vue'
 import Config from './components/Config.vue'
 import SimulationPage from './components/SimulationPage.vue'
@@ -70,7 +70,9 @@ export default {
         calculationType: TraceCalculationType.STATIC,
         alignment: 4,
         choice: TraceChoice.NORMAL,
-        kValue: 0
+        kValue: 0,
+        competType: TraceCompetitionType.RAW,
+        competSlope: 4,
       },
       cycle: -1,
       cyclesToRun: 60,
