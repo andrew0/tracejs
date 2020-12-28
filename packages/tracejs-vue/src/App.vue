@@ -40,7 +40,7 @@
         :visualize="showVisualizations" />
     </div>
     <div v-else-if="activeTab == 7" style="display: flex; flex: 1 1 auto; min-height: 0;">
-      <analysis :chart-data="chartData" :config="analysisConfig" />
+      <analysis :chart-data="chartData" :config="analysisConfig" :sim-config="config" />
     </div>
     <pre v-else style="flex: 1 1 auto; margin: 0; background: #eee; width: 100%; overflow: scroll;">{{ dat }}</pre>
   </div>
