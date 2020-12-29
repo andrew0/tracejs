@@ -208,6 +208,13 @@ export default {
       },
     }
   },
+  watch: {
+    numItemsToWatch(val) {
+      if (!this.useSpecifiedItems) {
+        this.config.itemsToWatch = val;
+      }
+    },
+  },
   methods: {
     isWatchingItem(item) {
       return this.itemsToWatch.has(item);
