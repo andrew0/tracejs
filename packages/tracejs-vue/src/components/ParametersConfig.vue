@@ -1,6 +1,8 @@
 <template>
   <div>
     <parameter-config-input v-model="config.modelInput" label="Model Input" note="" />
+    <continuum-spec :config="config" />
+    <parameter-config-input v-model="config.continuumSpec" label="continuumSpec" note="Ambiguous phoneme continuum" />
     <parameter-config-input v-model="config.alpha.IF" label="ALPHA[if]" note="Input-Feature weights" />
     <parameter-config-input v-model="config.alpha.FP" label="ALPHA[fp]" note="Feature-Phoneme weights" />
     <parameter-config-input v-model="config.alpha.PW" label="ALPHA[fw]" note="Phoneme-Word weights" />
@@ -34,12 +36,12 @@
     <parameter-config-input v-model="config.nreps" label="nreps" note="Input presentation rate" />
     <parameter-config-input v-model="config.slicesPerPhon" label="slicesPerPhon" note="Phoneme/Word slices per Feature" />
     <parameter-config-input v-model="config.lengthNormalization" label="lengthNormalization" note="0 or 1; normalize length effects." />
-    <parameter-config-input v-model="config.continuumSpec" label="continuumSpec" note="Ambiguous phoneme continuum" />
   </div>
 </template>
 
 <script>
 import ParameterConfigInput from './ParameterConfigInput.vue'
+import ContinuumSpec from './ContinuumSpec.vue'
 
 export default {
   props: {
@@ -48,6 +50,6 @@ export default {
       default: () => ({})
     },
   },
-  components: { ParameterConfigInput }
+  components: { ParameterConfigInput, ContinuumSpec }
 }
 </script>
