@@ -5,6 +5,9 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn --cwd packages/tracejs build"
+    "build": "yarn workspace tracejs build",
+    "cli": "node packages/tracejs/bin/cli.js",
+    "vue-dev": "yarn workspace tracejs-vue dev",
+    "vue-build": "yarn workspace tracejs-vue build"
   }
 }

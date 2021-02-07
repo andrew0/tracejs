@@ -5,9 +5,9 @@
     <parameter-config-input v-model="config.continuumSpec" label="continuumSpec" note="Ambiguous phoneme continuum" />
     <parameter-config-input v-model="config.alpha.IF" label="ALPHA[if]" note="Input-Feature weights" />
     <parameter-config-input v-model="config.alpha.FP" label="ALPHA[fp]" note="Feature-Phoneme weights" />
-    <parameter-config-input v-model="config.alpha.PW" label="ALPHA[fw]" note="Phoneme-Word weights" />
+    <parameter-config-input v-model="config.alpha.PW" label="ALPHA[pw]" note="Phoneme-Word weights" />
     <parameter-config-input v-model="config.alpha.PF" label="ALPHA[pf]" note="Phoneme-Feature weights" />
-    <parameter-config-input v-model="config.alpha.WP" label="ALPHA[wf]" note="Word-Phoneme weights" />
+    <parameter-config-input v-model="config.alpha.WP" label="ALPHA[wp]" note="Word-Phoneme weights" />
     <parameter-config-input v-model="config.gamma.F" label="GAMMA[f]" note="Feature layer inhibition" />
     <parameter-config-input v-model="config.gamma.P" label="GAMMA[p]" note="Phoneme layer inhibition" />
     <parameter-config-input v-model="config.gamma.W" label="GAMMA[w]" note="Word layer inhibition" />

@@ -9,7 +9,11 @@
   },
   "main": "dist/common/index.js",
   "module": "dist/esm/index.js",
-  "types": "lib/index.d.ts",
+  "browser": {
+    "./dist/cjs/trace-sim.js": "./dist/cjs/trace-sim-browser.js",
+    "./dist/esm/trace-sim.js": "./dist/esm/trace-sim-browser.js"
+  },
+  "types": "dist/esm/index.d.ts",
   "files": [
     "bin",
     "dist/**/*.js"
@@ -24,6 +28,7 @@
     "fast-xml-parser": "^3.17.4"
   },
   "devDependencies": {
+    "@types/node": "^12.0.0",
     "prettier": "^2.1.1",
     "typescript": "~3.9.0"
   }

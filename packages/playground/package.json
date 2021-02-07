@@ -1,0 +1,11 @@
+{
+  "name": "playground",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "author": "",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "tracejs": "*"
+  }
+}

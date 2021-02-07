@@ -14,7 +14,7 @@
     "vue-chartjs": "^3.5.1"
   },
   "devDependencies": {
-    "vite": "^1.0.0-rc.4",
-    "vite-plugin-vue2": "^0.1.4"
+    "vite": "^2.0.0-beta.65",
+    "vite-plugin-vue2": "^1.2.0"
   }
 }

@@ -1,42 +1,26 @@
-import TraceNet from './trace-net';
-import TraceConfig, { createDefaultConfig } from './trace-param';
-import TracePhones from './trace-phones';
-import { copy2D } from './util';
+// This file is excluded from browser builds (see trace-sim-browser.js)
 
-export default class TraceSim {
-  private tn: TraceNet;
-  public phonemes: TracePhones;
-  private maxDuration: number;
-  public inputLayer: number[][][] = [];
-  public featLayer: number[][][] = [];
-  public phonLayer: number[][][] = [];
-  public wordLayer: number[][][] = [];
-  public globalLexicalCompetition: number[] = [];
-  public globalPhonemeCompetition: number[] = [];
+import * as fs from 'fs';
+import * as path from 'path';
 
-  constructor(public config: TraceConfig = createDefaultConfig()) {
-    this.tn = new TraceNet(this.config);
-    this.phonemes = this.tn.phonemes;
-    this.maxDuration = Math.max(
-      6 * this.config.modelInput.length * this.config.deltaInput,
-      this.config.fSlices
-    );
+import TraceSimBase from './trace-sim-base';
+
+function writeFiles(dir: string, data: any[][][]) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
+  data.forEach((cycle, index) => {
+    const filepath = path.join(dir, index.toString().padStart(4, '0')) + '.csv';
+    fs.writeFileSync(filepath, cycle.map((row) => row.join(', ')).join('\n'));
+  });
+}
 
-  public getStepsRun(): number {
-    return this.inputLayer.length;
-  }
-
-  public cycle(numCycles: number) {
-    numCycles = Math.min(this.maxDuration, numCycles);
-    for (let i = 0; i < numCycles; i++) {
-      this.inputLayer.push(copy2D(this.tn.inputLayer));
-      this.featLayer.push(copy2D(this.tn.featLayer));
-      this.phonLayer.push(copy2D(this.tn.phonLayer));
-      this.wordLayer.push(copy2D(this.tn.wordLayer));
-      this.globalLexicalCompetition.push(this.tn.globalLexicalCompetitionIndex);
-      this.globalPhonemeCompetition.push(this.tn.globalPhonemeCompetitionIndex);
-      this.tn.cycle();
-    }
+export default class TraceSim extends TraceSimBase {
+  public writeFiles(dir: string) {
+    const { input, feature, phoneme, word } = this.getSimData();
+    writeFiles(path.join(dir, 'input'), input);
+    writeFiles(path.join(dir, 'feature'), feature);
+    writeFiles(path.join(dir, 'phoneme'), phoneme);
+    writeFiles(path.join(dir, 'word'), word);
   }
 }

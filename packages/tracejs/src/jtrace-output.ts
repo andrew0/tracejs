@@ -15,7 +15,7 @@ export const serializeJtLexicon = (lex: TraceWord[]) => {
   return result;
 };
 
-const formatter = Intl.NumberFormat(navigator.language, {
+const formatter = Intl.NumberFormat('en-US', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 10,
 });

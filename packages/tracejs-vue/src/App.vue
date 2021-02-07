@@ -179,25 +179,17 @@ export default {
 
       switch (tab) {
         case 2:
-          return this.sim.inputLayer[cycle]
-            .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join(separator))
-            .join('\n')
+          return this.sim.getInputData(cycle).map((row) => row.join(separator)).join('\n');
         case 3:
-          return this.sim.featLayer[cycle]
-            .map((row, index) => [index, ...row.map(x => x.toFixed(4))].join(separator))
-            .join('\n')
+          return this.sim.getFeatureData(cycle).map((row) => row.join(separator)).join('\n');
         case 4:
-          return this.sim.phonLayer[cycle]
-            .map((row, index) => [this.sim.phonemes && this.sim.phonemes.byIndex(index).label, ...row.map(x => x.toFixed(4))].join(separator))
-            .join('\n')
+          return this.sim.getPhonemeData(cycle).map((row) => row.join(separator)).join('\n');
         case 5:
-          return this.sim.wordLayer[cycle]
-            .map((row, index) => [this.sim.config.lexicon[index].phon, ...row.map(x => x.toFixed(4))].join(separator))
-            .join('\n')
+          return this.sim.getWordData(cycle).map((row) => row.join(separator)).join('\n');
         case 6:
-          return this.analysisData
+          return this.analysisData;
         default:
-          return ''
+          return '';
       }
     }
   },
