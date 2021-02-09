@@ -1,14 +1,18 @@
 const tracejs = require('tracejs');
-const path = require('path');
 
 const feedbackValues = [0, 0.03];
-for (const value of feedbackValues) {
-  const config = tracejs.createDefaultConfig();
-  config.alpha.PW = value;
+const lexicon = tracejs.loadJtLexicon('./slex_dahan2001.xml').slice(0, 5); // remove .slice(0, 5) to use full lexicon
 
-  const sim = new tracejs.TraceSim(config);
-  sim.cycle(30);
-
-  const dir = path.join(__dirname, 'pw_' + value.toString());
-  sim.writeFiles(dir);
+for (const word of lexicon) {
+  for (const feedbackValue of feedbackValues) {
+    const config = tracejs.createDefaultConfig();
+    config.modelInput = word.phon;
+    config.lexicon = lexicon;
+    config.alpha.PW = feedbackValue;
+  
+    const sim = new tracejs.TraceSim(config);
+    sim.cycle(30);
+  
+    sim.writeFiles(process.cwd(), `${word.phon}_${feedbackValue}`);
+  }
 }

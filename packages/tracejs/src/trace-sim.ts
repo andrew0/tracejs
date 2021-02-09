@@ -5,22 +5,30 @@ import * as path from 'path';
 
 import TraceSimBase from './trace-sim-base';
 
-function writeFiles(dir: string, data: any[][][]) {
+function writeFile(filepath: string, data: any[][][]) {
+  const numRows = data[0]?.length || 0;
+  const allCycles: any[][] = [];
+  for (let row = 0; row < numRows; row++) {
+    for (let cycle = 0; cycle < data.length; cycle++) {
+      allCycles.push([cycle, ...data[cycle][row]])
+    }
+  }
+
+  const dir = path.dirname(filepath);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  data.forEach((cycle, index) => {
-    const filepath = path.join(dir, index.toString().padStart(4, '0')) + '.csv';
-    fs.writeFileSync(filepath, cycle.map((row) => row.join(', ')).join('\n'));
-  });
+  fs.writeFileSync(filepath, allCycles.map((row) => row.join(', ')).join('\n'));
 }
 
 export default class TraceSim extends TraceSimBase {
-  public writeFiles(dir: string) {
+  public writeFiles(dir: string, prefix = '') {
+    const prefixUnderscore = prefix ? `${prefix}_` : '';
+
     const { input, feature, phoneme, word } = this.getSimData();
-    writeFiles(path.join(dir, 'input'), input);
-    writeFiles(path.join(dir, 'feature'), feature);
-    writeFiles(path.join(dir, 'phoneme'), phoneme);
-    writeFiles(path.join(dir, 'word'), word);
+    writeFile(path.join(dir, `${prefixUnderscore}input.csv`), input);
+    writeFile(path.join(dir, `${prefixUnderscore}feature.csv`), feature);
+    writeFile(path.join(dir, `${prefixUnderscore}phoneme.csv`), phoneme);
+    writeFile(path.join(dir, `${prefixUnderscore}word.csv`), word);
   }
 }

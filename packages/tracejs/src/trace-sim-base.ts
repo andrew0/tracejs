@@ -3,7 +3,7 @@ import TraceConfig, { createDefaultConfig } from './trace-param';
 import TracePhones from './trace-phones';
 import { copy2D } from './util';
 
-export default class TraceSimBase {
+export default abstract class TraceSimBase {
   private tn: TraceNet;
   public phonemes: TracePhones;
   private maxDuration: number;
@@ -70,4 +70,6 @@ export default class TraceSimBase {
       word: Array.from({ length: this.wordLayer.length }, (_, k) => this.getWordData(k)),
     };
   }
+
+  abstract writeFiles(dir: string, prefix?: string);
 }

@@ -10,8 +10,10 @@
   "main": "dist/common/index.js",
   "module": "dist/esm/index.js",
   "browser": {
-    "./dist/cjs/trace-sim.js": "./dist/cjs/trace-sim-browser.js",
-    "./dist/esm/trace-sim.js": "./dist/esm/trace-sim-browser.js"
+    "./dist/cjs/trace-sim.js": "./dist/cjs/browser/trace-sim.js",
+    "./dist/esm/trace-sim.js": "./dist/esm/browser/trace-sim.js",
+    "./dist/cjs/jtrace-file-input.js": "./dist/cjs/browser/jtrace-file-input.js",
+    "./dist/esm/jtrace-file-input.js": "./dist/esm/browser/jtrace-file-input.js"
   },
   "types": "dist/esm/index.d.ts",
   "files": [
