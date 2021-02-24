@@ -13,13 +13,13 @@ export default defineComponent({
         elements: {
           point: {
             radius: 0,
-            hitRadius: 0
-          }
-        }
-      }
-    }
+            hitRadius: 0,
+          },
+        },
+      },
+    };
   },
   mounted() {
-    this.renderChart(this.chartData, this.options)
-  }
+    this.renderChart(this.chartData, this.options);
+  },
 });

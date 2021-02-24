@@ -42,13 +42,30 @@
         Visualize word/phoneme activations
       </label>
     </template>
+
+    <div style="flex: 1">
+      <a class="button" @click="saveData" style="float: right">Save sim data</a>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
+import FileSaver from 'file-saver';
+import JSZip from '@progress/jszip-esm';
 
 import { getStore } from '../store';
+
+const serializeData = (data: any[][][]) => {
+  const numRows = data[0]?.length || 0;
+  const allCycles: any[][] = [];
+  for (let row = 0; row < numRows; row++) {
+    for (let cycle = 0; cycle < data.length; cycle++) {
+      allCycles.push([cycle, ...data[cycle][row]]);
+    }
+  }
+  return allCycles.map((row) => row.join(', ')).join('\n');
+};
 
 export default defineComponent({
   name: 'SimulationToolbar',
@@ -104,6 +121,20 @@ export default defineComponent({
           clearInterval(timer.value);
           timer.value = null;
         }
+      },
+      async saveData() {
+        const sim = store.sim.value;
+        if (!sim) {
+          return;
+        }
+
+        const zip = new JSZip();
+        const { input, feature, phoneme, word } = sim.getSimData();
+        zip.file('input.csv', serializeData(input));
+        zip.file('feature.csv', serializeData(feature));
+        zip.file('phoneme.csv', serializeData(phoneme));
+        zip.file('word.csv', serializeData(word));
+        FileSaver.saveAs(await zip.generateAsync({ type: 'blob' }), 'tracejs-sim.zip');
       },
     };
   },
