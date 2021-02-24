@@ -9,7 +9,7 @@
         <component :is="activeComponent"></component>
       </template>
 
-      <template #fallback> loading... </template>
+      <template #fallback>loading...</template>
     </Suspense>
   </main>
 </template>

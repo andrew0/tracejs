@@ -82,7 +82,7 @@ export function generateChart(chartId, chartType) {
         });
       },
     },
-    beforeDestroy() {
+    beforeUnmount() {
       if (this.$data._chart) {
         this.$data._chart.destroy();
       }

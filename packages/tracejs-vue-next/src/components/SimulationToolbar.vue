@@ -31,9 +31,16 @@
 
       <a class="button" @click="currentCycle = Number(currentCycle) + 1">+</a>
 
-      <a style="margin-left: 1rem" class="button" @click="toggleTimer">{{
+      <a style="margin-left: 0.5rem" class="button" @click="toggleTimer">{{
         timer ? 'stop animation' : 'start animation'
       }}</a>
+    </template>
+
+    <template v-if="showChartOptions">
+      <label class="checkbox" style="margin-left: 2rem">
+        <input type="checkbox" v-model="useBoxChart" />
+        Visualize word/phoneme activations
+      </label>
     </template>
   </div>
 </template>
@@ -47,6 +54,10 @@ export default defineComponent({
   name: 'SimulationToolbar',
   props: {
     showCycles: {
+      type: Boolean,
+      default: false,
+    },
+    showChartOptions: {
       type: Boolean,
       default: false,
     },
@@ -72,6 +83,7 @@ export default defineComponent({
     };
 
     return {
+      useBoxChart: store.useBoxChart,
       calculatedCycles: store.calculatedCycles,
       cyclesToCalculate: computed({
         get: () => store.cyclesToCalculate.value.toString(),

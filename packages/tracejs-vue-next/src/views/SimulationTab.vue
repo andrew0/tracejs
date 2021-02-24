@@ -1,15 +1,17 @@
 <template>
   <div :class="$style.container">
     <div :class="$style.toolbar">
-      <SimulationToolbar show-cycles />
+      <SimulationToolbar show-cycles show-chart-options />
     </div>
 
     <div :class="$style.main">
       <div :class="$style.grid">
         <FeatureActivationsChart :class="$style['chart-wrapper']" />
-        <WordActivationsChart :class="$style['chart-wrapper']" />
+        <WordActivationsChart v-show="!useBoxChart" :class="$style['chart-wrapper']" />
+        <WordBoxChart v-show="useBoxChart" :class="$style['chart-wrapper']" />
         <ModelInputChart :class="$style['chart-wrapper']" />
-        <PhonemeActivationsChart :class="$style['chart-wrapper']" />
+        <PhonemeActivationsChart v-show="!useBoxChart" :class="$style['chart-wrapper']" />
+        <PhonemeBoxChart v-show="useBoxChart" :class="$style['chart-wrapper']" />
       </div>
     </div>
   </div>
@@ -21,8 +23,11 @@ import { defineComponent } from 'vue';
 import SimulationToolbar from '../components/SimulationToolbar.vue';
 import FeatureActivationsChart from '../components/charts/FeatureActivationsChart.vue';
 import WordActivationsChart from '../components/charts/WordActivationsChart.vue';
+import WordBoxChart from '../components/charts/WordBoxChart.vue';
 import ModelInputChart from '../components/charts/ModelInputChart.vue';
 import PhonemeActivationsChart from '../components/charts/PhonemeActivationsChart.vue';
+import PhonemeBoxChart from '../components/charts/PhonemeBoxChart.vue';
+import { getStore } from '../store';
 
 export default defineComponent({
   name: 'SimulationTab',
@@ -30,8 +35,15 @@ export default defineComponent({
     SimulationToolbar,
     FeatureActivationsChart,
     WordActivationsChart,
+    WordBoxChart,
     ModelInputChart,
     PhonemeActivationsChart,
+    PhonemeBoxChart,
+  },
+  setup() {
+    return {
+      useBoxChart: getStore().useBoxChart,
+    };
   },
 });
 </script>

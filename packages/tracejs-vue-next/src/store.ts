@@ -67,6 +67,11 @@ class Store {
     return this._formattedWordData;
   }
 
+  private _useBoxChart = ref(false);
+  get useBoxChart() {
+    return this._useBoxChart;
+  }
+
   runSimulation() {
     // create a copy of the config object
     // trace.js accesses the object a lot, and it's a lot slower if it's
@@ -94,4 +99,4 @@ export const createStore = () => {
   return store;
 };
 
-export const getStore = () => inject<ReturnType<typeof createStore>>(StoreSymbol)!;
+export const getStore = () => inject<Store>(StoreSymbol)!;
