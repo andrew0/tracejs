@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.container">
     <div :class="$style.toolbar">
-      <SimulationToolbar show-cycles />
+      <SimulationToolbar :show-cycles="showCycles" />
     </div>
 
     <!-- make sure this doesn't get formatted to multiple lines, since -->
@@ -12,10 +12,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { defineComponent } from 'vue';
 
 import SimulationToolbar from '../components/SimulationToolbar.vue';
-import { getStore } from '../store';
 
 export default defineComponent({
   name: 'DataTab',
@@ -23,29 +22,14 @@ export default defineComponent({
     SimulationToolbar,
   },
   props: {
-    tab: {
-      type: String as PropType<'input' | 'feature' | 'phoneme' | 'word' | 'analysis'>,
-      required: true,
+    showCycles: {
+      type: Boolean,
+      default: true,
     },
-  },
-  setup(props) {
-    const store = getStore();
-    return {
-      data: computed(() => {
-        switch (props.tab) {
-          case 'input':
-            return store.formattedInputData.value;
-          case 'feature':
-            return store.formattedFeatureData.value;
-          case 'phoneme':
-            return store.formattedPhonemeData.value;
-          case 'word':
-            return store.formattedWordData.value;
-          default:
-            return '';
-        }
-      }),
-    };
+    data: {
+      type: String,
+      default: '',
+    },
   },
 });
 </script>
