@@ -1,13 +1,13 @@
 <template>
   <div :class="$style.container">
     <div :class="$style.toolbar">
-      <SimulationToolbar />
+      <SimulationToolbar show-cycles />
     </div>
 
     <!-- make sure this doesn't get formatted to multiple lines, since -->
     <!-- whitespace will get displayed in the <pre> tag -->
     <!-- prettier-ignore -->
-    <pre :class="$style.main">{{ data }}</pre>
+    <pre :class="$style.main">{{ data || 'No data' }}</pre>
   </div>
 </template>
 
