@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { TraceNet } from 'tracejs';
 
 // @ts-ignore
 import SimulationChart from './SimulationChart';
@@ -22,13 +23,25 @@ import { getStore } from '../../store';
 
 export default defineComponent({
   components: { SimulationChart },
-  setup() {
+  props: {
+    reactive: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
     const store = getStore();
     return {
       store,
       numXTicks: CONTINUA.length * NUM_FEATURES,
       numYTicks: NUM_FEATURES,
-      chartData: computed(() => store.sim.value?.inputLayer[store.currentCycle.value] || []),
+      chartData: computed(() => {
+        if (!props.reactive) {
+          return store.sim.value?.inputLayer[store.currentCycle.value] || [];
+        } else {
+          return new TraceNet(store.config).inputLayer || [];
+        }
+      }),
       yLabelCallback(_: any, index: number) {
         if (index < CONTINUA.length) {
           return CONTINUA[index];

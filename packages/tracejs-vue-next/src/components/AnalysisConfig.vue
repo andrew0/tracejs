@@ -1,5 +1,9 @@
 <template>
   <div>
+    <p>
+      NOTE: if the chart doesn't appear, try resizing your browser window to make it redraw (this is
+      a known bug)
+    </p>
     <div class="field">
       <label class="label">Analyze</label>
       <div class="control">
