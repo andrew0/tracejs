@@ -1,6 +1,6 @@
 <template>
-  <div class="tabs is-boxed">
-    <ul style="padding: 0.25em 0 0 0.5em">
+  <div :class="{ tabs: true, 'is-boxed': isBoxed }">
+    <ul style="padding: 0.25rem 0 0 0.5rem">
       <li
         v-for="(label, index) in labels"
         :key="index"
@@ -25,6 +25,10 @@ export default defineComponent({
     activeIndex: {
       type: Number,
       default: 0,
+    },
+    isBoxed: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['update:activeIndex'],

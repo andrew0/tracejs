@@ -1,6 +1,6 @@
 <template>
   <nav :class="$style.nav">
-    <NavigationTabs :labels="labels" v-model:active-index="activeIndex" />
+    <NavigationTabs :labels="labels" v-model:active-index="activeIndex" is-boxed />
   </nav>
 
   <main :class="$style.main">
@@ -15,15 +15,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, computed, Component } from 'vue';
+import { defineComponent, defineAsyncComponent, ref, computed } from 'vue';
 
 import NavigationTabs from './components/NavigationTabs.vue';
 import { createStore } from './store';
-
-interface NavigationTab {
-  label: string;
-  component: Component;
-}
 
 export default defineComponent({
   name: 'App',
@@ -31,7 +26,7 @@ export default defineComponent({
     NavigationTabs,
   },
   setup() {
-    const tabs: NavigationTab[] = [
+    const tabs = [
       {
         label: 'Config',
         component: defineAsyncComponent(() => import('./views/ConfigTab.vue')),
@@ -88,16 +83,17 @@ html {
   height: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 </style>
 
 <style module>
 .nav {
-  flex: 0 1 auto;
+  flex: 0;
 }
 
 .main {
-  flex: 1 1 auto;
+  flex: 1;
+  overflow-y: auto;
+  background: #fafafa;
 }
 </style>

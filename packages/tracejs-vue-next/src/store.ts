@@ -1,19 +1,13 @@
-import { reactive, provide, inject, readonly } from 'vue';
+import { createDefaultConfig } from 'tracejs';
+import { reactive, provide, inject, toRefs } from 'vue';
 
 export const StoreSymbol = Symbol();
 
 export const createStore = () => {
-  const state = reactive({
+  const store = reactive({
     numCycles: 0,
+    config: createDefaultConfig(),
   });
-
-  const store = {
-    state: readonly(state),
-
-    setNumCycles(numCycles: number) {
-      state.numCycles = numCycles;
-    },
-  };
 
   provide(StoreSymbol, store);
 
