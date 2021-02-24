@@ -2,7 +2,8 @@
   "private": true,
   "version": "0.0.0",
   "workspaces": [
-    "packages/*"
+    "packages/tracejs",
+    "packages/tracejs-vue-next"
   ],
   "scripts": {
     "build": "yarn workspace tracejs build",

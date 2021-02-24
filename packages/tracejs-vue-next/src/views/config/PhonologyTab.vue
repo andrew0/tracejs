@@ -85,6 +85,7 @@
 import { createDefaultPhoneme } from 'tracejs';
 import { computed, defineComponent, ref } from 'vue';
 
+import { CONTINUA, NUM_FEATURES } from '../../constants';
 import { getStore } from '../../store';
 
 export default defineComponent({
@@ -92,11 +93,7 @@ export default defineComponent({
   setup() {
     const store = getStore();
 
-    const continua = ['POW', 'VOC', 'DIF', 'ACU', 'GRD', 'VOI', 'BUR'];
-    const numFeatures = 9;
-    const sortedPhonemes = computed(() =>
-      [...store.config.phonology].sort((a, b) => a.label.localeCompare(b.label))
-    );
+    const sortedPhonemes = store.sortedPhonemes;
     const activePhoneme = ref(sortedPhonemes.value[0]);
 
     const addPhoneme = () => {
@@ -115,8 +112,8 @@ export default defineComponent({
     };
 
     return {
-      continua,
-      numFeatures,
+      continua: CONTINUA,
+      numFeatures: NUM_FEATURES,
       sortedPhonemes,
       activePhoneme,
       addPhoneme,

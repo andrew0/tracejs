@@ -12,6 +12,13 @@ class Store {
     return this._config;
   }
 
+  private _sortedPhonemes = computed(() =>
+    [...this.config.phonology].sort((a, b) => a.label.localeCompare(b.label))
+  );
+  get sortedPhonemes() {
+    return this._sortedPhonemes;
+  }
+
   private _sim = ref<TraceSim | null>(null);
   get sim() {
     return this._sim;
