@@ -39,7 +39,11 @@ export default defineComponent({
         if (!props.reactive) {
           return store.sim.value?.inputLayer[store.currentCycle.value] || [];
         } else {
-          return new TraceNet(store.config).inputLayer || [];
+          try {
+            return new TraceNet(store.config).inputLayer || [];
+          } catch {
+            return [];
+          }
         }
       }),
       yLabelCallback(_: any, index: number) {
