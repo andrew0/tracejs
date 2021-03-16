@@ -76,7 +76,7 @@
     </div>
 
     <div style="flex: 1; display: flex; align-items: center; justify-content: center">
-      <ModelInputChart style="width: 700px; height: 500px" reactive />
+      <ModelInputChart style="width: 700px; height: 500px" />
     </div>
   </div>
 </template>

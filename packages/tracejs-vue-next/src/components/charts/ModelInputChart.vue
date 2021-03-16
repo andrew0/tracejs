@@ -23,27 +23,17 @@ import { getStore } from '../../store';
 
 export default defineComponent({
   components: { SimulationChart },
-  props: {
-    reactive: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup(props) {
+  setup() {
     const store = getStore();
     return {
       store,
       numXTicks: CONTINUA.length * NUM_FEATURES,
       numYTicks: NUM_FEATURES,
       chartData: computed(() => {
-        if (!props.reactive) {
-          return store.sim.value?.inputLayer[store.currentCycle.value] || [];
-        } else {
-          try {
-            return new TraceNet(store.config).inputLayer || [];
-          } catch {
-            return [];
-          }
+        try {
+          return new TraceNet(store.config).inputLayer || [];
+        } catch {
+          return [];
         }
       }),
       yLabelCallback(_: any, index: number) {
