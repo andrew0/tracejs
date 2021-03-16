@@ -191,12 +191,8 @@ export default defineComponent({
       choiceForced: TraceChoice.FORCED,
 
       alignments: {
-        Average: TraceCalculationType.AVERAGE,
-        'Max (Ad-Hoc)': TraceCalculationType.MAX_ADHOC,
-        'Max (Ad-Hoc-2)': TraceCalculationType.MAX_ADHOC_2,
         'Max (Post-Hoc)': TraceCalculationType.MAX_POSTHOC,
         Specified: TraceCalculationType.STATIC,
-        'Frauenfelder (x, x+1)': TraceCalculationType.FRAUENFELDER,
       },
 
       contentType,
@@ -212,8 +208,7 @@ export default defineComponent({
         const { calculationType } = config;
         return (
           contentType.value !== TraceContentType.COMPETITION_INDEX &&
-          (calculationType === TraceCalculationType.FRAUENFELDER ||
-            calculationType === TraceCalculationType.STATIC)
+          calculationType === TraceCalculationType.STATIC
         );
       }),
       shouldShowLuceChoice: computed(
