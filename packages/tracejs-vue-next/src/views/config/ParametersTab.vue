@@ -2,12 +2,7 @@
   <div :class="$style.columns">
     <div style="padding: 1rem; width: 600px; overflow-y: auto">
       <ConfigInput v-model="config.modelInput" label="Model Input" note="" type="text" />
-      <ConfigInput
-        v-model="config.continuumSpec"
-        label="continuumSpec"
-        note="Ambiguous phoneme continuum"
-        type="text"
-      />
+      <ContinuumSpecInput />
       <ConfigInput v-model="config.alpha.IF" label="ALPHA[if]" note="Input-Feature weights" />
       <ConfigInput v-model="config.alpha.FP" label="ALPHA[fp]" note="Feature-Phoneme weights" />
       <ConfigInput v-model="config.alpha.PW" label="ALPHA[pw]" note="Phoneme-Word weights" />
@@ -77,6 +72,7 @@
 import { defineComponent, computed } from 'vue';
 
 import ConfigInput from '../../components/ConfigInput.vue';
+import ContinuumSpecInput from '../../components/ContinuumSpecInput.vue';
 import ModelInputChart from '../../components/charts/ModelInputChart.vue';
 import { getStore } from '../../store';
 
@@ -84,6 +80,7 @@ export default defineComponent({
   name: 'ParametersTab',
   components: {
     ConfigInput,
+    ContinuumSpecInput,
     ModelInputChart,
   },
   setup() {
