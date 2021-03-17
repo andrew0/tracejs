@@ -5,3 +5,4 @@ export * from './trace-param';
 export * from './jtrace-file-input';
 export * from './jtrace-input';
 export * from './jtrace-output';
+export * from './stream';

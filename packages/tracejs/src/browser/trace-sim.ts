@@ -4,4 +4,6 @@ import TraceSimBase from '../trace-sim-base';
 
 export default class TraceSim extends TraceSimBase {
   public writeFiles() {}
+
+  public appendFiles() {}
 }

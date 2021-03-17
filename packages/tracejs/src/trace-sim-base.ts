@@ -1,3 +1,5 @@
+import { Writable } from 'stream';
+
 import TraceNet from './trace-net';
 import TraceConfig, { createDefaultConfig } from './trace-param';
 import TracePhones from './trace-phones';
@@ -62,14 +64,65 @@ export default abstract class TraceSimBase {
     ]);
   }
 
+  public getAllInputData() {
+    return Array.from({ length: this.inputLayer.length }, (_, k) => this.getInputData(k));
+  }
+
+  public getAllFeatureData() {
+    return Array.from({ length: this.featLayer.length }, (_, k) => this.getFeatureData(k));
+  }
+
+  public getAllPhonemeData() {
+    return Array.from({ length: this.phonLayer.length }, (_, k) => this.getPhonemeData(k));
+  }
+
+  public getAllWordData() {
+    return Array.from({ length: this.wordLayer.length }, (_, k) => this.getWordData(k));
+  }
+
+  public serializeInputData(prefix: string[] = []) {
+    const fullPrefix = [this.config.modelInput, ...prefix];
+    return serializeData(this.getAllInputData(), fullPrefix);
+  }
+
+  public serializeFeatureData(prefix: string[] = []) {
+    const fullPrefix = [this.config.modelInput, ...prefix];
+    return serializeData(this.getAllFeatureData(), fullPrefix);
+  }
+
+  public serializePhonemeData(prefix: string[] = []) {
+    const fullPrefix = [this.config.modelInput, ...prefix];
+    return serializeData(this.getAllPhonemeData(), fullPrefix);
+  }
+
+  public serializeWordData(prefix: string[] = []) {
+    const fullPrefix = [this.config.modelInput, ...prefix];
+    return serializeData(this.getAllWordData(), fullPrefix);
+  }
+
   public getSimData() {
     return {
-      input: Array.from({ length: this.inputLayer.length }, (_, k) => this.getInputData(k)),
-      feature: Array.from({ length: this.featLayer.length }, (_, k) => this.getFeatureData(k)),
-      phoneme: Array.from({ length: this.phonLayer.length }, (_, k) => this.getPhonemeData(k)),
-      word: Array.from({ length: this.wordLayer.length }, (_, k) => this.getWordData(k)),
+      input: this.getAllInputData(),
+      feature: this.getAllFeatureData(),
+      phoneme: this.getAllPhonemeData(),
+      word: this.getAllWordData(),
     };
   }
 
   abstract writeFiles(dir: string, prefix?: string);
+
+  abstract appendFiles(files: Writable[], prefix?: string[]);
+}
+
+function serializeData(data: any[][][], prefix: string[]) {
+  const numRows = data[0]?.length || 0;
+  const allCycles: any[][] = [];
+  for (let row = 0; row < numRows; row++) {
+    for (let cycle = 0; cycle < data.length; cycle++) {
+      allCycles.push([cycle, ...data[cycle][row]]);
+    }
+  }
+
+  // put cycle first, then prefix, then rest of row
+  return allCycles.map((row) => [row[0], ...prefix, row.slice(1)].join(', ')).join('\n');
 }

@@ -2,6 +2,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { Writable } from 'stream';
 
 import TraceSimBase from './trace-sim-base';
 
@@ -10,7 +11,7 @@ function writeFile(filepath: string, data: any[][][]) {
   const allCycles: any[][] = [];
   for (let row = 0; row < numRows; row++) {
     for (let cycle = 0; cycle < data.length; cycle++) {
-      allCycles.push([cycle, ...data[cycle][row]])
+      allCycles.push([cycle, ...data[cycle][row]]);
     }
   }
 
@@ -30,5 +31,12 @@ export default class TraceSim extends TraceSimBase {
     writeFile(path.join(dir, `${prefixUnderscore}feature.csv`), feature);
     writeFile(path.join(dir, `${prefixUnderscore}phoneme.csv`), phoneme);
     writeFile(path.join(dir, `${prefixUnderscore}word.csv`), word);
+  }
+
+  public appendFiles(files: Writable[], prefix?: string[]) {
+    files[0].write(this.serializeInputData(prefix));
+    files[1].write(this.serializeFeatureData(prefix));
+    files[2].write(this.serializePhonemeData(prefix));
+    files[3].write(this.serializeWordData(prefix));
   }
 }
