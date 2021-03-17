@@ -1,0 +1,1 @@
+import{d as a,g as t,o,a as r,k as e}from"./index.f093451a.js";import{_ as d}from"./DataTab.d5d008d6.js";import"./SimulationToolbar.74812d39.js";var s=a({name:"FeatureTab",components:{DataTab:d},setup:()=>({data:t().formattedFeatureData})});s.render=function(a,t,d,s,n,m){const u=e("DataTab");return o(),r(u,{data:a.data},null,8,["data"])};export default s;
