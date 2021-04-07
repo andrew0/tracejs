@@ -1,1 +1,0 @@
-import{d as a,g as t,o as s,a as o,k as d}from"./index.f093451a.js";import{_ as n}from"./DataTab.d5d008d6.js";import"./SimulationToolbar.74812d39.js";var r=a({name:"AnalysisTab",components:{DataTab:n},setup:()=>({data:t().formattedAnalysisData})});r.render=function(a,t,n,r,e,i){const m=d("DataTab");return s(),o(m,{data:a.data,"show-cycles":!1},null,8,["data"])};export default r;
