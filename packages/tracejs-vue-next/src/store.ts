@@ -115,6 +115,13 @@ class Store {
     return this._formattedWordData;
   }
 
+  private _formattedLevelsAndFlowData = computed(() =>
+    formatData(this._sim.value?.getAllLevelsAndFlowData().map(([data], index) => [index, ...data]))
+  );
+  get formattedLevelsAndFlowData() {
+    return this._formattedLevelsAndFlowData;
+  }
+
   private _analysisData = ref<any[]>([]);
   get analysisData() {
     return this._analysisData;

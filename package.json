@@ -8,7 +8,7 @@
   "scripts": {
     "build": "yarn workspace tracejs build",
     "cli": "node packages/tracejs/bin/cli.js",
-    "vue-dev": "yarn workspace tracejs-vue dev",
-    "vue-build": "yarn workspace tracejs-vue build"
+    "vue-dev": "yarn workspace tracejs-vue-next dev",
+    "vue-build": "yarn workspace tracejs-vue-next build"
   }
 }

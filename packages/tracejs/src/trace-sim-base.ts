@@ -13,8 +13,19 @@ export default abstract class TraceSimBase {
   public featLayer: number[][][] = [];
   public phonLayer: number[][][] = [];
   public wordLayer: number[][][] = [];
+  public globalFeatureCompetition: number[] = [];
   public globalLexicalCompetition: number[] = [];
   public globalPhonemeCompetition: number[] = [];
+  public globalPhonToWordSum: number[] = [];
+  public globalWordToPhonSum: number[] = [];
+  public globalFeatToPhonSum: number[] = [];
+  public globalPhonToFeatSum: number[] = [];
+  public globalFeatSumAll: number[] = [];
+  public globalFeatSumPos: number[] = [];
+  public globalPhonSumAll: number[] = [];
+  public globalPhonSumPos: number[] = [];
+  public globalWordSumAll: number[] = [];
+  public globalWordSumPos: number[] = [];
 
   constructor(public config: TraceConfig = createDefaultConfig()) {
     this.tn = new TraceNet(this.config);
@@ -36,8 +47,19 @@ export default abstract class TraceSimBase {
       this.featLayer.push(copy2D(this.tn.featLayer));
       this.phonLayer.push(copy2D(this.tn.phonLayer));
       this.wordLayer.push(copy2D(this.tn.wordLayer));
+      this.globalFeatureCompetition.push(this.tn.globalFeatureCompetitionIndex);
       this.globalLexicalCompetition.push(this.tn.globalLexicalCompetitionIndex);
       this.globalPhonemeCompetition.push(this.tn.globalPhonemeCompetitionIndex);
+      this.globalPhonToWordSum.push(this.tn.globalPhonToWordSum);
+      this.globalWordToPhonSum.push(this.tn.globalWordToPhonSum);
+      this.globalFeatToPhonSum.push(this.tn.globalFeatToPhonSum);
+      this.globalPhonToFeatSum.push(this.tn.globalPhonToFeatSum);
+      this.globalFeatSumAll.push(this.tn.globalFeatSumAll);
+      this.globalFeatSumPos.push(this.tn.globalFeatSumPos);
+      this.globalPhonSumAll.push(this.tn.globalPhonSumAll);
+      this.globalPhonSumPos.push(this.tn.globalPhonSumPos);
+      this.globalWordSumAll.push(this.tn.globalWordSumAll);
+      this.globalWordSumPos.push(this.tn.globalWordSumPos);
       this.tn.cycle();
     }
   }
@@ -64,6 +86,26 @@ export default abstract class TraceSimBase {
     ]);
   }
 
+  public getLevelsAndFlowData(cycle: number) {
+    return [
+      [
+        this.globalFeatSumAll[cycle],
+        this.globalFeatSumPos[cycle],
+        this.globalFeatureCompetition[cycle],
+        this.globalPhonSumAll[cycle],
+        this.globalPhonSumPos[cycle],
+        this.globalPhonemeCompetition[cycle],
+        this.globalWordSumAll[cycle],
+        this.globalWordSumPos[cycle],
+        this.globalLexicalCompetition[cycle],
+        this.globalFeatToPhonSum[cycle],
+        this.globalPhonToFeatSum[cycle],
+        this.globalPhonToWordSum[cycle],
+        this.globalWordToPhonSum[cycle],
+      ],
+    ];
+  }
+
   public getAllInputData() {
     return Array.from({ length: this.inputLayer.length }, (_, k) => this.getInputData(k));
   }
@@ -78,6 +120,10 @@ export default abstract class TraceSimBase {
 
   public getAllWordData() {
     return Array.from({ length: this.wordLayer.length }, (_, k) => this.getWordData(k));
+  }
+
+  public getAllLevelsAndFlowData() {
+    return Array.from({ length: this.globalLexicalCompetition.length }, (_, k) => this.getLevelsAndFlowData(k));
   }
 
   public serializeInputData(prefix: string[] = []) {
@@ -100,12 +146,18 @@ export default abstract class TraceSimBase {
     return serializeData(this.getAllWordData(), fullPrefix);
   }
 
+  public serializeLevelsAndFlowData(prefix: string[] = []) {
+    const fullPrefix = [this.config.modelInput, ...prefix];
+    return serializeData(this.getAllLevelsAndFlowData(), fullPrefix);
+  }
+
   public getSimData() {
     return {
       input: this.getAllInputData(),
       feature: this.getAllFeatureData(),
       phoneme: this.getAllPhonemeData(),
       word: this.getAllWordData(),
+      levelsAndFlows: this.getAllLevelsAndFlowData(),
     };
   }
 
@@ -124,5 +176,5 @@ function serializeData(data: any[][][], prefix: string[]) {
   }
 
   // put cycle first, then prefix, then rest of row
-  return allCycles.map((row) => [row[0], ...prefix, row.slice(1)].join(', ')).join('\n');
+  return allCycles.map((row) => [row[0], ...prefix, row.slice(1)].join(', ')).join('\n') + '\n';
 }

@@ -52,6 +52,10 @@ export default defineComponent({
         component: defineAsyncComponent(() => import('./views/WordTab.vue')),
       },
       {
+        label: 'Levels and Flow',
+        component: defineAsyncComponent(() => import('./views/LevelsAndFlowTab.vue')),
+      },
+      {
         label: 'Analysis',
         component: defineAsyncComponent(() => import('./views/AnalysisTab.vue')),
       },

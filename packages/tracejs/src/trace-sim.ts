@@ -38,5 +38,6 @@ export default class TraceSim extends TraceSimBase {
     files[1].write(this.serializeFeatureData(prefix));
     files[2].write(this.serializePhonemeData(prefix));
     files[3].write(this.serializeWordData(prefix));
+    files[4].write(this.serializeLevelsAndFlowData(prefix));
   }
 }

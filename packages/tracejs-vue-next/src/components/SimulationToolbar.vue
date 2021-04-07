@@ -8,7 +8,7 @@
       type="number"
       style="width: 6rem; margin: 0 0.5rem"
     />
-    <a class="button" @click="calculate">Calculate</a>
+    <a class="button" @click="calculate">Simulate</a>
 
     <template v-if="showCycles">
       <label for="current-cycle" style="margin-left: 2.5rem">Current cycle:</label>

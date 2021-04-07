@@ -21,8 +21,19 @@ export default class TraceNet {
   public wordLayer: number[][];
   public wordNet: number[][];
 
+  public globalFeatureCompetitionIndex: number;
   public globalLexicalCompetitionIndex: number;
   public globalPhonemeCompetitionIndex: number;
+  public globalPhonToWordSum: number;
+  public globalWordToPhonSum: number;
+  public globalFeatToPhonSum: number;
+  public globalPhonToFeatSum: number;
+  public globalFeatSumAll: number;
+  public globalFeatSumPos: number;
+  public globalPhonSumAll: number;
+  public globalPhonSumPos: number;
+  public globalWordSumAll: number;
+  public globalWordSumPos: number;
 
   private pww: number[][];
   private wpw: number[][];
@@ -308,6 +319,7 @@ export default class TraceNet {
   // variable names taken from cTRACE.
   // input-to-feature activation, AND feature-to-feature inhibition.
   private actFeatures() {
+    this.globalFeatureCompetitionIndex = 0;
     // computes total inhibition coming from a continuum to each node at that time slice
     // sum of prev slice's positive activations summed over each continuum at each fslice
     const fsum: number[][] = util.zeros2D(CONTINUA_PER_FEATURE, this.config.fSlices);
@@ -335,9 +347,11 @@ export default class TraceNet {
         ) {
           //small variation from original
           //input->feature activation
-          this.featNet[fIndex][fslice] += this.clamp(
+          const n = this.clamp(
             this.config.alpha.IF * this.inputLayer[fIndex][fslice]
           );
+          this.featNet[fIndex][fslice] += n;
+          this.globalFeatureCompetitionIndex -= n;
         }
       }
     }
@@ -346,11 +360,13 @@ export default class TraceNet {
     for (let c = 0; c < CONTINUA_PER_FEATURE; c++) {
       for (let f = 0; f < NUM_FEATURES; f++) {
         for (let fslice = 0; fslice < this.config.fSlices; fslice++) {
-          this.featNet[c * NUM_FEATURES + f][fslice] -= Math.max(
+          const n = Math.max(
             0,
             ffi[c][fslice] -
               Math.max(0, this.featLayer[c * NUM_FEATURES + f][fslice] * this.config.gamma.F)
           );
+          this.featNet[c * NUM_FEATURES + f][fslice] -= n;
+          this.globalFeatureCompetitionIndex += n;
         }
       }
     }
@@ -362,6 +378,7 @@ export default class TraceNet {
   private featToPhon() {
     const FPP = this.config.slicesPerPhon;
     const pSlices = this.getPSlices();
+    this.globalFeatToPhonSum = 0;
     // for every feature at every slice, if the units activation is above zero,
     // then send activation to phonNet from the featLayer scaled by PhonDefs,
     // spread, fwp and alpha.
@@ -402,7 +419,9 @@ export default class TraceNet {
             const c = Math.floor(featIndex / NUM_FEATURES);
             for (let pslice = pstart; pslice < pend + 1 && pslice < pSlices; pslice++) {
               //System.out.println(phon+"\t"+pslice+"\t"+phon+"\t"+c+"\t"+winstart);
-              this.phonNet[idx][pslice] += this.fpw[idx][c][winstart] * t; //crash here when FPP=1 (java.lang.ArrayIndexOutOfBoundsException: 14)
+              const n = this.fpw[idx][c][winstart] * t;
+              this.phonNet[idx][pslice] += n;
+              this.globalFeatToPhonSum += n;
               //winstart+=3; //changing this hard-coded line...
               winstart += FPP; //to this.  (seems to work 04/19/2007)
             }
@@ -486,7 +505,7 @@ export default class TraceNet {
   public phonToFeat() {
     const fSlices = this.config.fSlices;
     const fpp = this.config.slicesPerPhon;
-
+    this.globalPhonToFeatSum = 0;
     for (let fslice = 0; fslice < fSlices; fslice++) {
       for (let cont = 0; cont < CONTINUA_PER_FEATURE; cont++) {
         //loop over all continua (7)
@@ -506,7 +525,9 @@ export default class TraceNet {
                   this.phonemes.byIndex(phon).features[cont * NUM_FEATURES + feat];
             }
           }
-          this.featNet[cont * NUM_FEATURES + feat][fslice] += this.config.alpha.PF * activation;
+          const n = this.config.alpha.PF * activation;
+          this.featNet[cont * NUM_FEATURES + feat][fslice] += n;
+          this.globalPhonToFeatSum += n;
         }
       }
     }
@@ -519,6 +540,7 @@ export default class TraceNet {
     let str: string;
     let wslot: number, pmin: number, pwin: number, pmax: number;
     const pSlices = this.getPSlices();
+    this.globalWordToPhonSum = 0;
     // for every word in the lexicon
     for (let word = 0; word < dict.length; word++) {
       // for each word slice
@@ -571,11 +593,13 @@ export default class TraceNet {
                 wprim = this.config.primeNode.RDL_wt_s * Math.log10(dict[word].prime);
 
               // scale the activation by alpha and wpw
-              this.phonNet[currPhon.index][pslice] +=
+              const n =
                 (1 + wfrq + wprim) *
                 this.wordLayer[word][wslice] *
                 this.config.alpha.WP *
                 this.wpw[currPhon.index][pwin];
+              this.phonNet[currPhon.index][pslice] += n;
+              this.globalWordToPhonSum += n;
             }
           }
         }
@@ -588,6 +612,7 @@ export default class TraceNet {
     const dict = this.config.lexicon;
     const pSlices = this.getPSlices();
     let wpeak, wmin, winstart, wmax, pdur, strlen;
+    this.globalPhonToWordSum = 0;
     // for each phoneme
     for (let phon = 0; phon < this.config.phonology.length; phon++) {
       pdur = 2;
@@ -644,7 +669,9 @@ export default class TraceNet {
               ) {
                 if (winstart >= 0 && winstart < 4) {
                   //scale activation by pww; this determines how temporal offset should affect excitation
-                  this.wordNet[word][wslice] += (1 + wfrq + wprm) * this.pww[phon][winstart] * t;
+                  const n = (1 + wfrq + wprm) * this.pww[phon][winstart] * t;
+                  this.wordNet[word][wslice] += n;
+                  this.globalPhonToWordSum += n;
                 }
               }
             }
@@ -750,6 +777,8 @@ export default class TraceNet {
    */
   public featUpdate() {
     const { min, max } = this.config;
+    this.globalFeatSumAll = 0;
+    this.globalFeatSumPos = 0;
     for (let slice = 0; slice < this.config.fSlices; slice++) {
       for (let feat = 0; feat < NUM_FEATURES * CONTINUA_PER_FEATURE; feat++) {
         if (this.config.stochasticitySD) {
@@ -767,6 +796,10 @@ export default class TraceNet {
         if (t < min) t = min;
         //final update for feature layer
         this.featLayer[feat][slice] = t;
+        this.globalFeatSumAll += t;
+        if (t > 0) {
+          this.globalFeatSumPos += t;          
+        }
       }
     }
     this.featNet = util.zeros2D(NUM_FEATURES * CONTINUA_PER_FEATURE, this.config.fSlices);
@@ -778,6 +811,8 @@ export default class TraceNet {
    */
   public phonUpdate() {
     const pSlices = this.getPSlices();
+    this.globalPhonSumAll = 0;
+    this.globalPhonSumPos = 0;
     for (let pslice = 0; pslice < pSlices; pslice++) {
       for (let phon = 0; phon < this.config.phonology.length; phon++) {
         if (this.config.stochasticitySD) {
@@ -795,6 +830,10 @@ export default class TraceNet {
         this.phonLayer[phon][pslice] +=
           diff * this.phonNet[phon][pslice] - this.config.decay.P * rest;
         this.phonLayer[phon][pslice] = this.clamp(this.phonLayer[phon][pslice]);
+        this.globalPhonSumAll += this.phonLayer[phon][pslice];
+        if (this.phonLayer[phon][pslice] > 0) {
+          this.globalPhonSumPos += this.phonLayer[phon][pslice];
+        }
       }
     }
     this.phonNet = util.zeros2D(this.config.phonology.length, pSlices);
@@ -807,6 +846,8 @@ export default class TraceNet {
   public wordUpdate() {
     const wSlices = this.getWSlices();
     const { min, max } = this.config;
+    this.globalWordSumAll = 0;
+    this.globalWordSumPos = 0;
     for (let word = 0; word < this.config.lexicon.length; word++) {
       for (let slice = 0; slice < wSlices; slice++) {
         // apply attention modulation (cf. Mirman et al., 2005)
@@ -855,6 +896,10 @@ export default class TraceNet {
         if (t > max) t = max;
         if (t < min) t = min;
         this.wordLayer[word][slice] = t;
+        this.globalWordSumAll += t;
+        if (t > 0) {
+          this.globalWordSumPos += t;
+        }
       }
     }
     this.wordNet = util.zeros2D(this.config.lexicon.length, wSlices);

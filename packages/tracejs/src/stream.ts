@@ -11,7 +11,7 @@ export function openFileHandle(filename: string): any {
 
 export function openFileHandles(dir: string, prefix?: string): any[] {
   const fullPrefix = prefix ? `${prefix}-` : '';
-  return ['input', 'feature', 'phoneme', 'word'].map((base) =>
+  return ['input', 'feature', 'phoneme', 'word', 'levels_and_flow'].map((base) =>
     openFileHandle(path.join(dir, `${fullPrefix}${base}.csv.gz`))
   );
 }
