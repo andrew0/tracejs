@@ -22,6 +22,16 @@ function writeFile(filepath: string, data: any[][][]) {
   fs.writeFileSync(filepath, allCycles.map((row) => row.join(', ')).join('\n'));
 }
 
+function write(stream: Writable, data: any) {
+  return new Promise((resolve) => {
+    if (!stream.write(data)) {
+      stream.once('drain', resolve);
+    } else {
+      process.nextTick(resolve);
+    }
+  });
+}
+
 export default class TraceSim extends TraceSimBase {
   public writeFiles(dir: string, prefix = '') {
     const prefixUnderscore = prefix ? `${prefix}_` : '';
@@ -33,11 +43,13 @@ export default class TraceSim extends TraceSimBase {
     writeFile(path.join(dir, `${prefixUnderscore}word.csv`), word);
   }
 
-  public appendFiles(files: Writable[], prefix?: string[]) {
-    files[0].write(this.serializeInputData(prefix));
-    files[1].write(this.serializeFeatureData(prefix));
-    files[2].write(this.serializePhonemeData(prefix));
-    files[3].write(this.serializeWordData(prefix));
-    files[4].write(this.serializeLevelsAndFlowData(prefix));
+  public async appendFiles(files: Writable[], prefix?: string[]) {
+    await Promise.all([
+      write(files[0], this.serializeInputData(prefix)),
+      write(files[1], this.serializeFeatureData(prefix)),
+      write(files[2], this.serializePhonemeData(prefix)),
+      write(files[3], this.serializeWordData(prefix)),
+      write(files[4], this.serializeInputData(prefix)),
+    ]);
   }
 }
