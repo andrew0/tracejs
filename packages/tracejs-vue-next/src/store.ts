@@ -116,7 +116,11 @@ class Store {
   }
 
   private _formattedLevelsAndFlowData = computed(() =>
-    formatData(this._sim.value?.getAllLevelsAndFlowData().map(([data], index) => [index, ...data]))
+    formatData(
+      this._sim.value
+        ?.getAllLevelsAndFlowData()
+        .map(([data], index) => [index, ...data.map((num) => num.toFixed(13).padEnd(18, ' '))])
+    )
   );
   get formattedLevelsAndFlowData() {
     return this._formattedLevelsAndFlowData;
