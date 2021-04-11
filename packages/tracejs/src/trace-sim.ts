@@ -23,7 +23,7 @@ function writeFile(filepath: string, data: any[][][]) {
 }
 
 function write(stream: Writable, data: any) {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     if (!stream.write(data)) {
       stream.once('drain', resolve);
     } else {
@@ -33,7 +33,7 @@ function write(stream: Writable, data: any) {
 }
 
 export default class TraceSim extends TraceSimBase {
-  public writeFiles(dir: string, prefix = '') {
+  writeFiles(dir: string, prefix = '') {
     const prefixUnderscore = prefix ? `${prefix}_` : '';
 
     const { input, feature, phoneme, word } = this.getSimData();
@@ -43,13 +43,33 @@ export default class TraceSim extends TraceSimBase {
     writeFile(path.join(dir, `${prefixUnderscore}word.csv`), word);
   }
 
-  public async appendFiles(files: Writable[], prefix?: string[]) {
+  async appendInputData(file: Writable, prefix?: string[]) {
+    return write(file, this.serializeInputData(prefix));
+  }
+
+  async appendFeatureData(file: Writable, prefix?: string[]) {
+    return write(file, this.serializeFeatureData(prefix));
+  }
+
+  async appendPhonemeData(file: Writable, prefix?: string[]) {
+    return write(file, this.serializePhonemeData(prefix));
+  }
+
+  async appendWordData(file: Writable, prefix?: string[]) {
+    return write(file, this.serializeWordData(prefix));
+  }
+
+  async appendLevelsAndFlowData(file: Writable, prefix?: string[]) {
+    return write(file, this.serializeLevelsAndFlowData(prefix));
+  }
+
+  async appendFiles(files: Writable[], prefix?: string[]) {
     await Promise.all([
-      write(files[0], this.serializeInputData(prefix)),
-      write(files[1], this.serializeFeatureData(prefix)),
-      write(files[2], this.serializePhonemeData(prefix)),
-      write(files[3], this.serializeWordData(prefix)),
-      write(files[4], this.serializeInputData(prefix)),
+      this.appendInputData(files[0], prefix),
+      this.appendFeatureData(files[1], prefix),
+      this.appendPhonemeData(files[2], prefix),
+      this.appendWordData(files[3], prefix),
+      this.appendLevelsAndFlowData(files[4], prefix),
     ]);
   }
 }

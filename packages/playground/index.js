@@ -10,7 +10,8 @@ async function simulate() {
 
   // Create file handles that we can continuously write to over the course of the
   // simulation
-  const files = tracejs.openFileHandles(process.cwd(), 'playground-sim');
+  const wordFile = tracejs.openFileHandle('./playground-sim-word.csv.gz');
+  const levelsAndFlowFile = tracejs.openFileHandle('./playground-sim-levels-and-flow.csv.gz');
 
   // Loop through each word in the lexicon. Each word is an object with the properties:
   //   word.phon = the actual word
@@ -33,13 +34,17 @@ async function simulate() {
       const sim = new tracejs.TraceSim(config);
       sim.cycle(60);
   
-      // Write the data to the stream, with the label "abc, def".
-      await sim.appendFiles(files, ['abc', 'def']);
+      // Write the data to the streams, with the label "abc, def".
+      await Promise.all([
+        sim.appendWordData(wordFile, ['abc', 'def']),
+        sim.appendLevelsAndFlowData(levelsAndFlowFile, ['abc', 'def']),
+      ]);
     }
   }
 
   // End the file streams when we're done
-  tracejs.closeFileHandles(files);
+  wordFile.end();
+  levelsAndFlowFile.end();
 }
 
 simulate();

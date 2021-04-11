@@ -3,7 +3,17 @@
 import TraceSimBase from '../trace-sim-base';
 
 export default class TraceSim extends TraceSimBase {
-  public writeFiles() {}
+  writeFiles() {}
 
-  public appendFiles() {}
+  async appendInputData() {}
+
+  async appendFeatureData() {}
+
+  async appendPhonemeData() {}
+
+  async appendWordData() {}
+
+  async appendLevelsAndFlowData() {}
+
+  async appendFiles() {}
 }

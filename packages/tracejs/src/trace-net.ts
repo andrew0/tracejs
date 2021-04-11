@@ -21,19 +21,19 @@ export default class TraceNet {
   public wordLayer: number[][];
   public wordNet: number[][];
 
-  public globalFeatureCompetitionIndex: number;
-  public globalLexicalCompetitionIndex: number;
-  public globalPhonemeCompetitionIndex: number;
-  public globalPhonToWordSum: number;
-  public globalWordToPhonSum: number;
-  public globalFeatToPhonSum: number;
-  public globalPhonToFeatSum: number;
-  public globalFeatSumAll: number;
-  public globalFeatSumPos: number;
-  public globalPhonSumAll: number;
-  public globalPhonSumPos: number;
-  public globalWordSumAll: number;
-  public globalWordSumPos: number;
+  public globalFeatureCompetitionIndex = 0;
+  public globalLexicalCompetitionIndex = 0;
+  public globalPhonemeCompetitionIndex = 0;
+  public globalPhonToWordSum = 0;
+  public globalWordToPhonSum = 0;
+  public globalFeatToPhonSum = 0;
+  public globalPhonToFeatSum = 0;
+  public globalFeatSumAll = 0;
+  public globalFeatSumPos = 0;
+  public globalPhonSumAll = 0;
+  public globalPhonSumPos = 0;
+  public globalWordSumAll = 0;
+  public globalWordSumPos = 0;
 
   private pww: number[][];
   private wpw: number[][];
@@ -347,9 +347,7 @@ export default class TraceNet {
         ) {
           //small variation from original
           //input->feature activation
-          const n = this.clamp(
-            this.config.alpha.IF * this.inputLayer[fIndex][fslice]
-          );
+          const n = this.clamp(this.config.alpha.IF * this.inputLayer[fIndex][fslice]);
           this.featNet[fIndex][fslice] += n;
           this.globalFeatureCompetitionIndex -= n;
         }
@@ -798,7 +796,7 @@ export default class TraceNet {
         this.featLayer[feat][slice] = t;
         this.globalFeatSumAll += t;
         if (t > 0) {
-          this.globalFeatSumPos += t;          
+          this.globalFeatSumPos += t;
         }
       }
     }

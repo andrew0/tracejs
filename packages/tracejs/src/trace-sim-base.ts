@@ -123,7 +123,9 @@ export default abstract class TraceSimBase {
   }
 
   public getAllLevelsAndFlowData() {
-    return Array.from({ length: this.globalLexicalCompetition.length }, (_, k) => this.getLevelsAndFlowData(k));
+    return Array.from({ length: this.globalLexicalCompetition.length }, (_, k) =>
+      this.getLevelsAndFlowData(k)
+    );
   }
 
   public serializeInputData(prefix: string[] = []) {
@@ -161,9 +163,19 @@ export default abstract class TraceSimBase {
     };
   }
 
+  abstract appendInputData(file: Writable, prefix?: string[]): Promise<void>;
+
+  abstract appendFeatureData(file: Writable, prefix?: string[]): Promise<void>;
+
+  abstract appendPhonemeData(file: Writable, prefix?: string[]): Promise<void>;
+
+  abstract appendWordData(file: Writable, prefix?: string[]): Promise<void>;
+
+  abstract appendLevelsAndFlowData(file: Writable, prefix?: string[]): Promise<void>;
+
   abstract writeFiles(dir: string, prefix?: string);
 
-  abstract appendFiles(files: Writable[], prefix?: string[]);
+  abstract appendFiles(files: Writable[], prefix?: string[]): Promise<void>;
 }
 
 function serializeData(data: any[][][], prefix: string[]) {
