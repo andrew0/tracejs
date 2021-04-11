@@ -10,6 +10,8 @@ async function simulate() {
 
   // Create file handles that we can continuously write to over the course of the
   // simulation
+  const featureFile = tracjs.openFileHandle('./playground-sim-feature.csv.gz');
+  const phonemeFile = tracejs.openFileHandles('./playground-phoneme.csv.gz');
   const wordFile = tracejs.openFileHandle('./playground-sim-word.csv.gz');
   const levelsAndFlowFile = tracejs.openFileHandle('./playground-sim-levels-and-flow.csv.gz');
 
@@ -36,6 +38,8 @@ async function simulate() {
   
       // Write the data to the streams, with the label "abc, def".
       await Promise.all([
+        sim.appendFeatureData(featureFile, ['abc', 'def']),
+        sim.appendPhonemeData(phonemeFile, ['abc', 'def']),
         sim.appendWordData(wordFile, ['abc', 'def']),
         sim.appendLevelsAndFlowData(levelsAndFlowFile, ['abc', 'def']),
       ]);
@@ -43,6 +47,8 @@ async function simulate() {
   }
 
   // End the file streams when we're done
+  featureFile.end();
+  phonemeFile.end();
   wordFile.end();
   levelsAndFlowFile.end();
 }
