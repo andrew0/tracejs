@@ -10,7 +10,7 @@ async function simulate() {
 
   // Create file handles that we can continuously write to over the course of the
   // simulation
-  const featureFile = tracjs.openFileHandle('./playground-sim-feature.csv.gz');
+  const featureFile = tracejs.openFileHandle('./playground-sim-feature.csv.gz');
   const phonemeFile = tracejs.openFileHandles('./playground-phoneme.csv.gz');
   const wordFile = tracejs.openFileHandle('./playground-sim-word.csv.gz');
   const levelsAndFlowFile = tracejs.openFileHandle('./playground-sim-levels-and-flow.csv.gz');
