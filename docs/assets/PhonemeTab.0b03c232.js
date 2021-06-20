@@ -1,1 +1,0 @@
-import{d as a,g as t,o,a as e,k as n}from"./index.98a10f1d.js";import{_ as r}from"./DataTab.f010576f.js";import"./SimulationToolbar.68a87b21.js";var s=a({name:"PhonemeTab",components:{DataTab:r},setup:()=>({data:t().formattedPhonemeData})});s.render=function(a,t,r,s,m,d){const f=n("DataTab");return o(),e(f,{data:a.data},null,8,["data"])};export default s;

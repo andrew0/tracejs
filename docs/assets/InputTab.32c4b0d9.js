@@ -1,1 +1,0 @@
-import{d as a,g as t,o,a as n,k as r}from"./index.98a10f1d.js";import{_ as s}from"./DataTab.f010576f.js";import"./SimulationToolbar.68a87b21.js";var d=a({name:"InputTab",components:{DataTab:s},setup:()=>({data:t().formattedInputData})});d.render=function(a,t,s,d,e,m){const f=r("DataTab");return o(),n(f,{data:a.data},null,8,["data"])};export default d;
