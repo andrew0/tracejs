@@ -55,6 +55,7 @@ class Store {
     kValue: 0,
     competType: TraceCompetitionType.RAW,
     competSlope: 4,
+    excludeSilence: false,
   });
   get analysisConfig() {
     return this._analysisConfig;

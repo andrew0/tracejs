@@ -69,6 +69,12 @@
           </label>
         </div>
       </div>
+      <div class="control" v-else>
+        <label class="checkbox">
+          <input type="checkbox" name="items" v-model="config.excludeSilence" />
+          Exclude silence phoneme
+        </label>
+      </div>
     </div>
 
     <div v-if="shouldShowAlignmentCalc" class="field">
