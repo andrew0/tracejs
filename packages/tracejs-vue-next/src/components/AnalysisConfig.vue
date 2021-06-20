@@ -157,7 +157,7 @@ export default defineComponent({
       },
     });
     watchEffect(() => {
-      if (!useSpecifiedItems) {
+      if (!useSpecifiedItems.value) {
         config.itemsToWatch = numItemsToWatch.value;
       }
     });

@@ -93,6 +93,14 @@ export const reactiveProp = {
       default: () => {},
     },
   },
+  emits: [
+    'labels:update',
+    'xlabels:update',
+    'ylabels:update',
+    'chart:update',
+    'chart:destroy',
+    'chart:render'
+  ],
   watch: {
     chartData: dataHandler,
   },
