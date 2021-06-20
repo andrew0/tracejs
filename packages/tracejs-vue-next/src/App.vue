@@ -36,6 +36,14 @@ export default defineComponent({
         component: defineAsyncComponent(() => import('./views/SimulationTab.vue')),
       },
       {
+        label: 'Chart',
+        component: defineAsyncComponent(() => import('./views/ChartTab.vue')),
+      },
+      {
+        label: 'Chart Data',
+        component: defineAsyncComponent(() => import('./views/ChartDataTab.vue')),
+      },
+      {
         label: 'Input',
         component: defineAsyncComponent(() => import('./views/InputTab.vue')),
       },
@@ -54,14 +62,6 @@ export default defineComponent({
       {
         label: 'Levels and Flow',
         component: defineAsyncComponent(() => import('./views/LevelsAndFlowTab.vue')),
-      },
-      {
-        label: 'Analysis',
-        component: defineAsyncComponent(() => import('./views/AnalysisTab.vue')),
-      },
-      {
-        label: 'Analysis (Chart)',
-        component: defineAsyncComponent(() => import('./views/ChartTab.vue')),
       },
     ];
     const activeIndex = ref(0);
