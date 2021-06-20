@@ -4,6 +4,11 @@
       NOTE: if the chart doesn't appear, try resizing your browser window to make it redraw (this is
       a known bug)
     </p>
+
+    <div class="field">
+      <button class="button" @click="store.updateAnalysis()">Refresh chart</button>
+    </div>
+
     <div class="field">
       <label class="label">Analyze</label>
       <div class="control">
@@ -174,6 +179,7 @@ export default defineComponent({
     });
 
     return {
+      store,
       simConfig,
       config,
       domainWords: TraceDomain.WORDS,
