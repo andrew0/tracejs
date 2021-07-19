@@ -26,14 +26,18 @@
     "build:common": "tsc --outDir dist/common --esModuleInterop --module commonjs -p .",
     "build:esm": "tsc --outDir dist/esm --allowSyntheticDefaultImports --module esnext -p .",
     "build": "yarn build:common && yarn build:esm",
-    "fmt": "prettier --parser=typescript --write src/**/*.ts"
+    "fmt": "prettier --parser=typescript --write src/**/*.ts",
+    "test": "jest"
   },
   "dependencies": {
     "fast-xml-parser": "^3.17.4"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.24",
     "@types/node": "^12.0.0",
+    "jest": "^27.0.6",
     "prettier": "^2.1.1",
+    "ts-jest": "^27.0.3",
     "typescript": "~3.9.0"
   }
 }
