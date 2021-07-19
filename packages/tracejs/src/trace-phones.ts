@@ -18,11 +18,6 @@ export default class TracePhones {
     this.phonemes = phonemes.map((x: TracePhone): TracePhoneInternal => ({ ...x }));
     // sort the phonemes by label
     this.sortPhonemes();
-
-    // diagnostic
-    for (const [index, phon] of this.phonemes.entries()) {
-      console.log(`phon ${index}: ${phon.label}`);
-    }
   }
 
   /**
@@ -123,8 +118,6 @@ export default class TracePhones {
     };
     computeSpread(this.phonemes);
     computeSpread(this.ambiguousPhonemes);
-
-    //console.log(JSON.stringify(this.phonemes.map(x => x.spread)))
   }
 
   /**
