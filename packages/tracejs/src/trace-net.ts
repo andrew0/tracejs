@@ -6,20 +6,21 @@ import TraceConfig, {
 import TracePhones from './trace-phones';
 import * as util from './util';
 import { applyRestScaling } from './response-probability';
+import { ModelInputError } from './errors';
 
 export default class TraceNet {
   private config: TraceConfig;
   public phonemes: TracePhones;
 
-  private lengthNormalizationScale: number;
+  private lengthNormalizationScale!: number;
 
-  public inputLayer: number[][];
-  public featLayer: number[][];
-  public featNet: number[][];
-  public phonLayer: number[][];
-  public phonNet: number[][];
-  public wordLayer: number[][];
-  public wordNet: number[][];
+  public inputLayer!: number[][];
+  public featLayer!: number[][];
+  public featNet!: number[][];
+  public phonLayer!: number[][];
+  public phonNet!: number[][];
+  public wordLayer!: number[][];
+  public wordNet!: number[][];
 
   public globalFeatureCompetitionIndex = 0;
   public globalLexicalCompetitionIndex = 0;
@@ -35,25 +36,18 @@ export default class TraceNet {
   public globalWordSumAll = 0;
   public globalWordSumPos = 0;
 
-  private pww: number[][];
-  private wpw: number[][];
-  private fpw: number[][][];
-  private pfw: number[][][];
+  private pww!: number[][];
+  private wpw!: number[][];
+  private fpw!: number[][][];
+  private pfw!: number[][][];
 
   private inputSlice: number = 0;
   private __nreps: number = 1;
 
   constructor(config: TraceConfig = createDefaultConfig()) {
-    this.setConfig(config);
-    this.reset();
-  }
-
-  /**
-   * Sets the configuration and initializes related objects
-   */
-  public setConfig(config: TraceConfig) {
     this.config = config;
     this.phonemes = new TracePhones(this.config.phonology);
+    this.reset();
   }
 
   public reset() {
@@ -103,7 +97,7 @@ export default class TraceNet {
     );
 
     // init feature layer to resting value
-    let rest = this.clamp(this.config.rest.F);
+    let rest = this.clamp(this.config.rest.F || 0);
     for (let fslice = 0; fslice < this.config.fSlices; fslice++) {
       for (let feat = 0; feat < CONTINUA_PER_FEATURE * NUM_FEATURES; feat++) {
         this.featLayer[feat][fslice] = rest;
@@ -111,7 +105,7 @@ export default class TraceNet {
     }
 
     // init phon layer to resting value
-    rest = this.clamp(this.config.rest.P);
+    rest = this.clamp(this.config.rest.P || 0);
     for (let slice = 0; slice < this.getPSlices(); slice++) {
       for (let phon = 0; phon < this.config.phonology.length; phon++) {
         this.phonLayer[phon][slice] = rest;
@@ -121,7 +115,7 @@ export default class TraceNet {
     // init word layer to resting value
     // Original frequency implementation from cTRACE is being dropped:
     //  wp->base = rest[W] + fscale*log(1. + wordfreq[i]);
-    rest = this.clamp(this.config.rest.W);
+    rest = this.clamp(this.config.rest.W || 0);
     for (let wslice = 0; wslice < this.getWSlices(); wslice++) {
       for (let word = 0; word < this.config.lexicon.length; word++) {
         this.wordLayer[word][wslice] = rest;
@@ -219,7 +213,6 @@ export default class TraceNet {
    */
   public createInput() {
     const phons = this.config.modelInput.trim();
-    console.log('TraceNet.createInput: phons=' + phons);
 
     // store the target
     /*if (phons == '-') {
@@ -239,6 +232,10 @@ export default class TraceNet {
         const splicePoint: number = +phons[++i];
         const p2 = this.phonemes.byLabel(phons[++i]);
         i += 1; // skip the } character
+
+        if (!p1 || !p2 || !p1.spread || !p1.spreadOffset || !p2.spread || !p2.spreadOffset) {
+          throw new ModelInputError();
+        }
 
         // first half of the spliced phoneme
         const inputOffset = slice - p1.spreadOffset;
@@ -271,6 +268,11 @@ export default class TraceNet {
       } else {
         // otherwise, we are dealing with a normal, or ambiguous phoneme input.
         const phon = this.phonemes.byLabel(phons[i]);
+
+        if (!phon || !phon.spread || !phon.spreadOffset) {
+          throw new ModelInputError();
+        }
+
         //System.out.println("phon->char "+phons.charAt(i+syntactic_incr)+"->"+phon);
         const inputOffset = slice - Math.round(phon.spreadOffset);
         // copy the spread phonemes onto the input layer (aligned correctly)
@@ -331,7 +333,7 @@ export default class TraceNet {
 
     // this block scales down the fsum value by Gamma.F
     //ff=[c][i]=fsum[c][i]*Gamma.F
-    const ffi = fsum.map((row) => row.map((node) => node * this.config.gamma.F));
+    const ffi = fsum.map((row) => row.map((node) => node * (this.config.gamma.F || 0)));
     /*const ffi: number[][] = util.zeros2D(CONTINUA_PER_FEATURE, this.config.fSlices)
     for (let c = 0; c < CONTINUA_PER_FEATURE; c++)
       for (let fslice = 0; fslice < this.config.fSlices; fslice++)
@@ -347,7 +349,7 @@ export default class TraceNet {
         ) {
           //small variation from original
           //input->feature activation
-          const n = this.clamp(this.config.alpha.IF * this.inputLayer[fIndex][fslice]);
+          const n = this.clamp((this.config.alpha.IF || 0) * this.inputLayer[fIndex][fslice]);
           this.featNet[fIndex][fslice] += n;
           this.globalFeatureCompetitionIndex -= n;
         }
@@ -361,7 +363,7 @@ export default class TraceNet {
           const n = Math.max(
             0,
             ffi[c][fslice] -
-              Math.max(0, this.featLayer[c * NUM_FEATURES + f][fslice] * this.config.gamma.F)
+              Math.max(0, this.featLayer[c * NUM_FEATURES + f][fslice] * (this.config.gamma.F || 0))
           );
           this.featNet[c * NUM_FEATURES + f][fslice] -= n;
           this.globalFeatureCompetitionIndex += n;
@@ -411,7 +413,7 @@ export default class TraceNet {
               t =
                 phone.features[featIndex] *
                 this.featLayer[featIndex][fslice] *
-                this.config.alpha.FP;
+                (this.config.alpha.FP || 0);
             }
 
             const c = Math.floor(featIndex / NUM_FEATURES);
@@ -453,7 +455,7 @@ export default class TraceNet {
           }
           // then add its activation to ppi, scaled by gamma.
           for (let i = pmin; i < pmax; i++)
-            ppi[i] += this.phonLayer[phon][slice] * this.config.gamma.P;
+            ppi[i] += this.phonLayer[phon][slice] * (this.config.gamma.P || 0);
         }
       }
     }
@@ -481,8 +483,8 @@ export default class TraceNet {
         }
         // here, we make up for self-inhibition, reimbursing nodes for inhibition that
         // originated from themselves.
-        if (this.phonLayer[phon][slice] * this.config.gamma.P > 0 && ppi[slice] > 0) {
-          const n = (pmax - pmin) * this.phonLayer[phon][slice] * this.config.gamma.P;
+        if (this.phonLayer[phon][slice] * (this.config.gamma.P || 0) > 0 && ppi[slice] > 0) {
+          const n = (pmax - pmin) * this.phonLayer[phon][slice] * (this.config.gamma.P || 0);
           this.phonNet[phon][slice] += n;
           this.globalPhonemeCompetitionIndex -= n;
         }
@@ -520,10 +522,10 @@ export default class TraceNet {
                 activation +=
                   this.pfw[phon][cont][d] *
                   this.phonLayer[phon][pslice] *
-                  this.phonemes.byIndex(phon).features[cont * NUM_FEATURES + feat];
+                  (this.phonemes.byIndex(phon)?.features[cont * NUM_FEATURES + feat] || 0);
             }
           }
-          const n = this.config.alpha.PF * activation;
+          const n = (this.config.alpha.PF || 0) * activation;
           this.featNet[cont * NUM_FEATURES + feat][fslice] += n;
           this.globalPhonToFeatSum += n;
         }
@@ -594,9 +596,9 @@ export default class TraceNet {
               const n =
                 (1 + wfrq + wprim) *
                 this.wordLayer[word][wslice] *
-                this.config.alpha.WP *
-                this.wpw[currPhon.index][pwin];
-              this.phonNet[currPhon.index][pslice] += n;
+                (this.config.alpha.WP || 0) *
+                this.wpw[currPhon!.index!][pwin];
+              this.phonNet[currPhon!.index!][pslice] += n;
               this.globalWordToPhonSum += n;
             }
           }
@@ -631,7 +633,7 @@ export default class TraceNet {
           //for each letter in the current word
           for (let offset = 0; offset < strlen; offset++) {
             //if that letter corresponds to the phoneme we're now considering...
-            if (str.charAt(offset) == this.phonemes.byIndex(phon).label.charAt(0)) {
+            if (str.charAt(offset) == this.phonemes.byIndex(phon)!.label.charAt(0)) {
               //then determine the temporal range of word units for which it
               //makes sense that the current phoneme should send activation to it.
               wpeak = pslice - pdur * offset;
@@ -647,7 +649,7 @@ export default class TraceNet {
                 winstart = 1;
               }
               //determine the raw amount of activation that is sent to the word units
-              let t = 2 * this.phonLayer[phon][pslice] * this.config.alpha.PW; //cTRACE: the 2 stands for word->scale
+              let t = 2 * this.phonLayer[phon][pslice] * (this.config.alpha.PW || 0); //cTRACE: the 2 stands for word->scale
 
               let wfrq = 0;
               if (this.config.freqNode.RDL_wt_s && dict[word].freq) {
@@ -711,7 +713,7 @@ export default class TraceNet {
     // there is also a built-in ceiling here, preventing inhibition over 3.0d.
     for (let wstart = 0; wstart < pSlices; wstart++) {
       if (wisum[wstart] > 3.0) wisum[wstart] = 3.0;
-      wwi[wstart] = wisum[wstart] * this.config.gamma.W;
+      wwi[wstart] = wisum[wstart] * (this.config.gamma.W || 0);
     }
     // now, repeat the looping over words and slices and apply the inhibition
     // accumulated at each slice to every word unit that overlaps with that slice.
@@ -751,7 +753,7 @@ export default class TraceNet {
             if (compensation_factor > 1) compensation_factor = 1;
             const n =
               (wmax - wmin) *
-              (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * this.config.gamma.W) *
+              (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * (this.config.gamma.W || 0)) *
               compensation_factor;
             this.wordNet[word][wstart] += n;
             this.globalLexicalCompetitionIndex -= n;
@@ -760,7 +762,7 @@ export default class TraceNet {
           else {
             const n =
               (wmax - wmin) *
-              (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * this.config.gamma.W);
+              (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * (this.config.gamma.W || 0));
             this.wordNet[word][wstart] += n;
             this.globalLexicalCompetitionIndex -= n;
           }
@@ -787,9 +789,9 @@ export default class TraceNet {
         let t = this.featLayer[feat][slice];
         if (this.featNet[feat][slice] > 0) t += (max - t) * this.featNet[feat][slice];
         else if (this.featNet[feat][slice] < 0) t += (t - min) * this.featNet[feat][slice];
-        let tt = this.featLayer[feat][slice] - this.config.rest.F;
+        let tt = this.featLayer[feat][slice] - (this.config.rest.F || 0);
         //if(t!=0)
-        t -= this.config.decay.F * tt;
+        t -= (this.config.decay.F || 0) * tt;
         if (t > max) t = max;
         if (t < min) t = min;
         //final update for feature layer
@@ -822,11 +824,11 @@ export default class TraceNet {
         if (this.phonNet[phon][pslice] >= 0) diff = this.config.max - this.phonLayer[phon][pslice];
         else diff = this.phonLayer[phon][pslice] - this.config.min;
 
-        const rest = this.phonLayer[phon][pslice] - this.config.rest.P;
+        const rest = this.phonLayer[phon][pslice] - (this.config.rest.P || 0);
 
         // final update for phoneme layer
         this.phonLayer[phon][pslice] +=
-          diff * this.phonNet[phon][pslice] - this.config.decay.P * rest;
+          diff * this.phonNet[phon][pslice] - (this.config.decay.P || 0) * rest;
         this.phonLayer[phon][pslice] = this.clamp(this.phonLayer[phon][pslice]);
         this.globalPhonSumAll += this.phonLayer[phon][pslice];
         if (this.phonLayer[phon][pslice] > 0) {
@@ -870,26 +872,26 @@ export default class TraceNet {
         )
           tt =
             this.wordLayer[word][slice] -
-            (this.config.rest.W +
+            ((this.config.rest.W || 0) +
               applyRestScaling(this.config.freqNode, this.config.lexicon[word].freq)) +
-            (this.config.rest.W +
+            ((this.config.rest.W || 0) +
               applyRestScaling(this.config.primeNode, this.config.lexicon[word].prime));
         //resting freq effects
         else if (this.config.freqNode.RDL_rest_s && this.config.lexicon[word].freq > 0)
           tt =
             this.wordLayer[word][slice] -
-            (this.config.rest.W +
+            ((this.config.rest.W || 0) +
               applyRestScaling(this.config.freqNode, this.config.lexicon[word].freq));
         //resting prime
         else if (this.config.primeNode.RDL_rest_s && this.config.lexicon[word].prime > 0)
           tt =
             this.wordLayer[word][slice] -
-            (this.config.rest.W +
+            ((this.config.rest.W || 0) +
               applyRestScaling(this.config.primeNode, this.config.lexicon[word].prime));
         //no resting prime or resting freq effects
-        else tt = this.wordLayer[word][slice] - this.config.rest.W;
+        else tt = this.wordLayer[word][slice] - (this.config.rest.W || 0);
         //if(tt != 0)
-        t -= this.config.decay.W * tt;
+        t -= (this.config.decay.W || 0) * tt;
 
         if (t > max) t = max;
         if (t < min) t = min;

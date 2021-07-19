@@ -31,8 +31,10 @@ export default defineComponent({
       numYTicks: NUM_FEATURES,
       chartData: computed(() => {
         try {
+          store.isModelInputValid.value = true;
           return new TraceNet(store.config).inputLayer || [];
         } catch {
+          store.isModelInputValid.value = false;
           return [];
         }
       }),

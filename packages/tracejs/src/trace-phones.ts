@@ -38,11 +38,11 @@ export default class TracePhones {
     return this.phonemes;
   }
 
-  public byIndex(index: number): TracePhoneInternal {
+  public byIndex(index: number): TracePhoneInternal | undefined {
     return this.phonemes[index];
   }
 
-  public byLabel(label: string): TracePhoneInternal {
+  public byLabel(label: string): TracePhoneInternal | undefined {
     return (
       this.phonemes.find((x) => x.label == label) ||
       this.ambiguousPhonemes.find((x) => x.label == label)
@@ -107,10 +107,10 @@ export default class TracePhones {
             const n = Math.floor(spread[spreadSteps] * phon.durationScalar[0]);
             for (let i = 0; i < n; i++) {
               // compute spread (should these be the same?)
-              phon.spread[cont][phon.spreadOffset + i] = phon.features[cont] * max - delta * i;
-              phon.spread[cont][phon.spreadOffset - i] = phon.spread[cont][phon.spreadOffset + i];
+              phon.spread[cont][phon.spreadOffset! + i] = phon.features[cont] * max - delta * i;
+              phon.spread[cont][phon.spreadOffset! - i] = phon.spread[cont][phon.spreadOffset! + i];
               // and normalization info
-              phon.norm += 2 * Math.pow(phon.spread[cont][phon.spreadOffset + i], 2);
+              phon.norm += 2 * Math.pow(phon.spread[cont][phon.spreadOffset! + i], 2);
             }
           }
         }

@@ -1,51 +1,54 @@
 <template>
   <div :class="$style.toolbar">
-    <label for="cycles-to-calculate">Cycles to calculate:</label>
-    <input
-      v-model="cyclesToCalculate"
-      class="input"
-      id="cycles-to-calculate"
-      type="number"
-      style="width: 6rem; margin: 0 0.5rem"
-    />
-    <a class="button" @click="calculate">Simulate</a>
+    <template v-if="isModelInputValid">
+      <label for="cycles-to-calculate">Cycles to calculate:</label>
+      <input
+        v-model="cyclesToCalculate"
+        class="input"
+        id="cycles-to-calculate"
+        type="number"
+        style="width: 6rem; margin: 0 0.5rem"
+      />
+      <a class="button" @click="calculate">Simulate</a>
 
-    <template v-if="showCycles">
-      <label for="current-cycle" style="margin-left: 2.5rem">Current cycle:</label>
+      <template v-if="showCycles">
+        <label for="current-cycle" style="margin-left: 2.5rem">Current cycle:</label>
 
-      <a
-        style="margin-left: 0.5rem"
-        class="button"
-        @click="currentCycle = Number(currentCycle) - 1"
-      >
-        -
-      </a>
+        <a
+          style="margin-left: 0.5rem"
+          class="button"
+          @click="currentCycle = Number(currentCycle) - 1"
+        >
+          -
+        </a>
 
-      <div class="select">
-        <select id="current-cycle" v-model="currentCycle">
-          <option v-for="(n, index) in calculatedCycles" :key="index" :value="index">
-            {{ index }}
-          </option>
-        </select>
+        <div class="select">
+          <select id="current-cycle" v-model="currentCycle">
+            <option v-for="(n, index) in calculatedCycles" :key="index" :value="index">
+              {{ index }}
+            </option>
+          </select>
+        </div>
+
+        <a class="button" @click="currentCycle = Number(currentCycle) + 1">+</a>
+
+        <a style="margin-left: 0.5rem" class="button" @click="toggleTimer">{{
+          timer ? 'stop animation' : 'start animation'
+        }}</a>
+      </template>
+
+      <template v-if="showChartOptions">
+        <label class="checkbox" style="margin-left: 2rem">
+          <input type="checkbox" v-model="useBoxChart" />
+          Visualize word/phoneme activations
+        </label>
+      </template>
+
+      <div style="flex: 1">
+        <a class="button" @click="saveData" style="float: right">Save sim data</a>
       </div>
-
-      <a class="button" @click="currentCycle = Number(currentCycle) + 1">+</a>
-
-      <a style="margin-left: 0.5rem" class="button" @click="toggleTimer">{{
-        timer ? 'stop animation' : 'start animation'
-      }}</a>
     </template>
-
-    <template v-if="showChartOptions">
-      <label class="checkbox" style="margin-left: 2rem">
-        <input type="checkbox" v-model="useBoxChart" />
-        Visualize word/phoneme activations
-      </label>
-    </template>
-
-    <div style="flex: 1">
-      <a class="button" @click="saveData" style="float: right">Save sim data</a>
-    </div>
+    <template v-else> The provided model input contains invalid characters. </template>
   </div>
 </template>
 
@@ -100,6 +103,7 @@ export default defineComponent({
     };
 
     return {
+      isModelInputValid: store.isModelInputValid,
       useBoxChart: store.useBoxChart,
       calculatedCycles: store.calculatedCycles,
       cyclesToCalculate: computed({
@@ -115,7 +119,7 @@ export default defineComponent({
       },
       toggleTimer() {
         if (!timer.value) {
-          timer.value = setInterval(incOrCancel, 250);
+          timer.value = setInterval(incOrCancel, 250) as any;
           incOrCancel();
         } else {
           clearInterval(timer.value);

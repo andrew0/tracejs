@@ -5,7 +5,8 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "rootDir": "src",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "strict": true
   },
   "exclude": ["node_modules", "dist"],
   "lib": ["es2017", "node"]

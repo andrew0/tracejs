@@ -74,7 +74,7 @@ export default abstract class TraceSimBase {
 
   public getPhonemeData(cycle: number) {
     return this.phonLayer[cycle].map((row, index) => [
-      this.phonemes && this.phonemes.byIndex(index).label,
+      (this.phonemes && this.phonemes.byIndex(index)?.label) || '?',
       ...row.map((x) => x.toFixed(4)),
     ]);
   }
@@ -173,7 +173,7 @@ export default abstract class TraceSimBase {
 
   abstract appendLevelsAndFlowData(file: Writable, prefix?: string[]): Promise<void>;
 
-  abstract writeFiles(dir: string, prefix?: string);
+  abstract writeFiles(dir: string, prefix?: string): void | Promise<void>;
 
   abstract appendFiles(files: Writable[], prefix?: string[]): Promise<void>;
 }

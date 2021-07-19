@@ -1,4 +1,4 @@
-import {createDefaultConfig, TraceSim} from '..';
+import { createDefaultConfig, TraceSim } from '..';
 
 test('output does not change unexpectedly', () => {
   const config = createDefaultConfig();

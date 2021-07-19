@@ -7,6 +7,7 @@ import {
   TraceChoice,
   TraceCompetitionType,
   TraceDomain,
+  ModelInputError,
 } from 'tracejs';
 
 import { reactive, ref, provide, inject, computed } from 'vue';
@@ -142,6 +143,11 @@ class Store {
     return this._useBoxChart;
   }
 
+  private _isModelInputValid = ref(true);
+  get isModelInputValid() {
+    return this._isModelInputValid;
+  }
+
   updateAnalysis() {
     // TODO: fix TraceSim typing
     this._analysisData.value = doSimAnalysis({
@@ -156,23 +162,31 @@ class Store {
   }
 
   runSimulation() {
-    // create a copy of the config object
-    // trace.js accesses the object a lot, and it's a lot slower if it's
-    // a reactive proxy.
-    const configCopy = JSON.parse(JSON.stringify(this._config));
+    this._isModelInputValid.value = true;
+    try {
+      // create a copy of the config object
+      // trace.js accesses the object a lot, and it's a lot slower if it's
+      // a reactive proxy.
+      const configCopy = JSON.parse(JSON.stringify(this._config));
 
-    console.time('trace.js');
-    const sim = new TraceSim(configCopy);
-    sim.cycle(this._cyclesToCalculate.value);
-    console.timeEnd('trace.js');
+      console.time('trace.js');
+      const sim = new TraceSim(configCopy);
+      sim.cycle(this._cyclesToCalculate.value);
+      console.timeEnd('trace.js');
 
-    this._currentCycle.value = Math.min(
-      Math.max(this.currentCycle.value, 0),
-      this._calculatedCycles.value
-    );
-    this._sim.value = sim;
+      this._currentCycle.value = Math.min(
+        Math.max(this.currentCycle.value, 0),
+        this._calculatedCycles.value
+      );
+      this._sim.value = sim;
 
-    this.updateAnalysis();
+      this.updateAnalysis();
+    } catch (e) {
+      if (e instanceof ModelInputError) {
+        this._isModelInputValid.value = false;
+      }
+      throw e;
+    }
   }
 }
 
