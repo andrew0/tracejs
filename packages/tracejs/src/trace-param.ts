@@ -52,25 +52,22 @@ export interface Gamma {
 }
 
 export interface RdlNode {
-  RDL_rest?: boolean // = true (on)
-  RDL_rest_s?: number // = 0.06
-  RDL_rest_c?: number // = 1.0
+  RDL_rest_s: number // = 0.06
+  RDL_rest_c: number // = 1.0
 
   /**
    * ph->wd connection frequency effect:
    *   phoneme-to-word transmission is scaled by frequency values.
    */
-  RDL_wt?: boolean // = true (on)
-  RDL_wt_s?: number // = 0.13
-  RDL_wt_c?: number // = 1.0
+  RDL_wt_s: number // = 0.13
+  RDL_wt_c: number // = 1.0
 
   /**
    * post-perceptual frequenct effect:
    *   LCR analysis calculation scales word responce probabilities by freq values.
    */
-  RDL_post?: boolean // = true (on)
   //RDL_post_s: number //purposely left out of specification
-  RDL_post_c?: number // = 15.0
+  RDL_post_c: number // = 15.0
 }
 
 export interface TraceAllophoneRelation {
@@ -631,8 +628,20 @@ export const createDefaultConfig = (): TraceConfig => ({
     { phon: '^s', freq: 672, prime: 0 },
     { phon: '-', freq: 1000, prime: 0 },
   ],
-  freqNode: {},
-  primeNode: {},
+  freqNode: {
+    RDL_rest_s: 0.0,
+    RDL_rest_c: 1.0,
+    RDL_wt_s: 0.0,
+    RDL_wt_c: 1.0,
+    RDL_post_c: 0.0,
+  },
+  primeNode: {
+    RDL_rest_s: 0.0,
+    RDL_rest_c: 1.0,
+    RDL_wt_s: 0.0,
+    RDL_wt_c: 1.0,
+    RDL_post_c: 0.0,
+  },
   continuumSpec: '',
   allophoneRelations: [],
 })

@@ -28,6 +28,12 @@
       <ConfigInput v-model="config.spreadScale[0]" label="spreadScale" note="Scales FETSPREADs" />
       <ConfigInput v-model="config.min" label="Min" note="Minimum activation" />
       <ConfigInput v-model="config.max" label="Max" note="Maximum activation" />
+      <ConfigInput v-model="config.freqNode.RDL_rest_s" label="Frq resting levels" />
+      <ConfigInput v-model="config.freqNode.RDL_wt_s" label="Frq phoneme->word weights" />
+      <ConfigInput v-model="config.freqNode.RDL_post_c" label="Frq post act" />
+      <ConfigInput v-model="config.primeNode.RDL_rest_s" label="Priming (rest)" />
+      <ConfigInput v-model="config.primeNode.RDL_wt_s" label="Priming (weight)" />
+      <ConfigInput v-model="config.primeNode.RDL_post_c" label="Priming (post-act)" />
       <ConfigInput v-model="config.spread[0]" label="FETSPREAD[pow]" note="Power feature spread" />
       <ConfigInput
         v-model="config.spread[1]"
