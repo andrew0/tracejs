@@ -72,7 +72,7 @@
       <div class="control" v-else>
         <label class="checkbox">
           <input type="checkbox" name="items" v-model="config.excludeSilence" />
-          Exclude silence phoneme
+          Exclude silence
         </label>
       </div>
     </div>
