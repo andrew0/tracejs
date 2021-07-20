@@ -1,1 +1,0 @@
-import{d as a,g as t,o,a as r,k as d}from"./index.11f31a86.js";import{_ as s}from"./DataTab.bd7aa004.js";import"./SimulationToolbar.8f44acaa.js";var n=a({name:"WordTab",components:{DataTab:s},setup:()=>({data:t().formattedWordData})});n.render=function(a,t,s,n,e,m){const f=d("DataTab");return o(),r(f,{data:a.data},null,8,["data"])};export default n;
