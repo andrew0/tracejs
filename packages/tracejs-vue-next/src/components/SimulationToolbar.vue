@@ -11,7 +11,7 @@
       />
       <a class="button" @click="calculate">Simulate</a>
 
-      <template v-if="showCycles">
+      <template v-if="showCycles && calculatedCycles">
         <label for="current-cycle" style="margin-left: 2.5rem">Current cycle:</label>
 
         <a
@@ -31,6 +31,16 @@
         </div>
 
         <a class="button" @click="currentCycle = Number(currentCycle) + 1">+</a>
+
+        <input
+          v-model="currentCycle"
+          style="margin-left: 0.5rem; width: 200px"
+          class="slider"
+          step="1"
+          min="0"
+          :max="calculatedCycles - 1"
+          type="range"
+        />
 
         <a style="margin-left: 0.5rem" class="button" @click="toggleTimer">{{
           timer ? 'stop animation' : 'start animation'
