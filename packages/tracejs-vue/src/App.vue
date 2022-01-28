@@ -15,10 +15,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, computed } from 'vue';
-
+import { defineComponent, defineAsyncComponent, ref, computed, ComputedRef } from 'vue';
 import NavigationTabs from './components/NavigationTabs.vue';
 import { createStore } from './store';
+
+interface Tab {
+  label: string | ComputedRef<string>;
+  component: ReturnType<typeof defineAsyncComponent>;
+}
 
 export default defineComponent({
   name: 'App',
@@ -26,9 +30,10 @@ export default defineComponent({
     NavigationTabs,
   },
   setup() {
-    const tabs = [
+    const store = createStore();
+    const tabs: Tab[] = [
       {
-        label: 'Config',
+        label: computed(() => `Config${store.isConfigChanged.value ? ' [*]' : ''}`),
         component: defineAsyncComponent(() => import('./views/ConfigTab.vue')),
       },
       {
@@ -67,10 +72,11 @@ export default defineComponent({
     const activeIndex = ref(0);
 
     return {
-      labels: tabs.map((tab) => tab.label),
+      labels: computed(() =>
+        tabs.map((tab) => (typeof tab.label === 'string' ? tab.label : tab.label.value))
+      ),
       activeIndex,
       activeComponent: computed(() => tabs[activeIndex.value].component),
-      store: createStore(),
     };
   },
 });

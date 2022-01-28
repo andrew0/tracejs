@@ -999,6 +999,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/hash-sum@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@types/hash-sum@npm:1.0.0"
+  checksum: 8eb446a86ed7a80c6a04f3083396bbbb7b34430ed553be161ff4e8e51d06d6f2755e6d2ffd059ad5ee8e059fbdadc6f838367781a893cc966811fde8f2c5aa47
+  languageName: node
+  linkType: hard
+
 "@types/istanbul-lib-coverage@npm:*, @types/istanbul-lib-coverage@npm:^2.0.0, @types/istanbul-lib-coverage@npm:^2.0.1":
   version: 2.0.3
   resolution: "@types/istanbul-lib-coverage@npm:2.0.3"
@@ -2507,6 +2514,13 @@ __metadata:
   dependencies:
     function-bind: ^1.1.1
   checksum: b9ad53d53be4af90ce5d1c38331e712522417d017d5ef1ebd0507e07c2fbad8686fffb8e12ddecd4c39ca9b9b47431afbb975b8abf7f3c3b82c98e9aad052792
+  languageName: node
+  linkType: hard
+
+"hash-sum@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "hash-sum@npm:2.0.0"
+  checksum: efeeacf09ecbd467202865403c3a1991fa15d4f4903c1148ecbe13223fdbf9ec6d7dc661e17e5ce6e776cd70d67b6ee4c82e0171318962435be45c1155175f3f
   languageName: node
   linkType: hard
 
@@ -4498,11 +4512,13 @@ __metadata:
   dependencies:
     "@progress/jszip-esm": ^1.0.3
     "@types/file-saver": ^2.0.5
+    "@types/hash-sum": ^1.0.0
     "@vitejs/plugin-vue": ^2.0.1
     "@vue/compiler-sfc": ^3.2.27
     bulma: ^0.9.3
     chart.js: ~2.8.0
     file-saver: ^2.0.5
+    hash-sum: ^2.0.0
     prettier: ^2.5.1
     tracejs: "*"
     typescript: ^4.5.4

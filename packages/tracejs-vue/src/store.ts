@@ -1,3 +1,4 @@
+import hashsum from 'hash-sum';
 import {
   TraceSim,
   createDefaultConfig,
@@ -9,6 +10,7 @@ import {
   TraceDomain,
   ModelInputError,
 } from 'tracejs';
+import TraceConfig from 'tracejs/dist/esm/trace-param';
 
 import { reactive, ref, provide, inject, computed } from 'vue';
 
@@ -58,6 +60,9 @@ class Store {
     [...this.config.phonology].sort((a, b) => a.label.localeCompare(b.label))
   );
   readonly sim = ref<TraceSim | null>(null);
+  readonly lastSimConfig = ref<TraceConfig>(JSON.parse(JSON.stringify(this.config)));
+  readonly lastSimConfigHash = ref<string | null>(hashsum(this.lastSimConfig.value));
+  readonly isConfigChanged = computed(() => this.lastSimConfigHash.value !== hashsum(this.config));
   readonly cyclesToCalculate = ref(60);
   readonly calculatedCycles = computed(() => this.sim.value?.getStepsRun() || 0);
   readonly currentCycle = ref(0);
@@ -116,6 +121,8 @@ class Store {
         this.calculatedCycles.value
       );
       this.sim.value = sim;
+      this.lastSimConfig.value = configCopy;
+      this.lastSimConfigHash.value = hashsum(configCopy);
 
       this.updateAnalysis();
     } catch (e) {
