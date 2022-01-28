@@ -2,6 +2,13 @@
   <div class="field is-horizontal" style="width: 30rem">
     <div class="field-label">
       <label class="label" style="width: 10rem">{{ label }}</label>
+      <button
+        class="button is-small"
+        v-if="lastValue != null && lastValue !== modelValue"
+        @click="$emit('update:modelValue', lastValue)"
+      >
+        Reset
+      </button>
     </div>
     <div class="field-body">
       <div class="field">
@@ -24,6 +31,10 @@ export default defineComponent({
     modelValue: {
       type: [String, Number],
       default: '',
+    },
+    lastValue: {
+      type: [String, Number],
+      default: null,
     },
     label: {
       type: String,
