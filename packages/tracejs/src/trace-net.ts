@@ -753,7 +753,9 @@ export default class TraceNet {
             if (compensation_factor > 1) compensation_factor = 1;
             const n =
               (wmax - wmin) *
-              (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * (this.config.gamma.W || 0)) *
+              (this.wordLayer[word][wstart] *
+                this.wordLayer[word][wstart] *
+                (this.config.gamma.W || 0)) *
               compensation_factor;
             this.wordNet[word][wstart] += n;
             this.globalLexicalCompetitionIndex -= n;
@@ -762,7 +764,9 @@ export default class TraceNet {
           else {
             const n =
               (wmax - wmin) *
-              (this.wordLayer[word][wstart] * this.wordLayer[word][wstart] * (this.config.gamma.W || 0));
+              (this.wordLayer[word][wstart] *
+                this.wordLayer[word][wstart] *
+                (this.config.gamma.W || 0));
             this.wordNet[word][wstart] += n;
             this.globalLexicalCompetitionIndex -= n;
           }

@@ -1,6 +1,6 @@
 {
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "workspaces": [
     "packages/tracejs",
     "packages/tracejs-vue"
@@ -8,8 +8,12 @@
   "scripts": {
     "build": "yarn workspace tracejs build",
     "cli": "node packages/tracejs/bin/cli.js",
-    "vue-dev": "yarn workspace tracejs-vue dev",
-    "vue-build": "yarn workspace tracejs-vue build"
+    "lint": "prettier --prose-wrap=always --write '*.md' && yarn workspace tracejs lint && yarn workspace tracejs-vue lint",
+    "vue-build": "yarn workspace tracejs-vue build",
+    "vue-dev": "yarn workspace tracejs-vue dev"
+  },
+  "dependencies": {
+    "prettier": "^2.5.1"
   },
   "packageManager": "yarn@3.1.1"
 }

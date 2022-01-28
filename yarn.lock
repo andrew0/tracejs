@@ -4088,6 +4088,8 @@ __metadata:
 "root-workspace-0b6124@workspace:.":
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
+  dependencies:
+    prettier: ^2.5.1
   languageName: unknown
   linkType: soft
 
