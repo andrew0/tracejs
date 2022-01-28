@@ -4492,9 +4492,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tracejs-vue-next@workspace:packages/tracejs-vue-next":
+"tracejs-vue@workspace:packages/tracejs-vue":
   version: 0.0.0-use.local
-  resolution: "tracejs-vue-next@workspace:packages/tracejs-vue-next"
+  resolution: "tracejs-vue@workspace:packages/tracejs-vue"
   dependencies:
     "@progress/jszip-esm": ^1.0.3
     "@types/file-saver": ^2.0.5
