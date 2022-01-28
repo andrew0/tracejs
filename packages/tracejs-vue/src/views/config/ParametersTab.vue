@@ -1,7 +1,12 @@
 <template>
   <div :class="$style.columns">
     <div style="padding: 1rem; width: 600px; overflow-y: auto">
-      <ConfigInput v-model="config.modelInput" label="Model Input" note="" type="text" />
+      <ConfigInput
+        v-model="config.modelInput"
+        label="Model Input"
+        note=""
+        :error="isModelInputValid ? '' : 'Model input contains invalid characters'"
+        type="text" />
       <ContinuumSpecInput />
       <ConfigInput v-model="config.alpha.IF" label="ALPHA[if]" note="Input-Feature weights" />
       <ConfigInput v-model="config.alpha.FP" label="ALPHA[fp]" note="Feature-Phoneme weights" />
@@ -92,6 +97,7 @@ export default defineComponent({
   setup() {
     const store = getStore();
     return {
+      isModelInputValid: store.isModelInputValid,
       config: computed(() => store.config),
     };
   },

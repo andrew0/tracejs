@@ -7,6 +7,9 @@
       <div class="field">
         <input class="input" :type="type" :value="modelValue" @input="onInput" />
         <p class="help is-info">{{ note }}</p>
+        <p class="help is-danger" v-if="error">
+          <span class="has-text-weight-bold">ERROR</span> {{ error }}
+        </p>
       </div>
     </div>
   </div>
@@ -27,6 +30,10 @@ export default defineComponent({
       default: '',
     },
     note: {
+      type: String,
+      default: '',
+    },
+    error: {
       type: String,
       default: '',
     },
