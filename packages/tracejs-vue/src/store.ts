@@ -42,12 +42,8 @@ const chartColors = [
 ];
 
 class Store {
-  private _config = reactive(createDefaultConfig());
-  get config() {
-    return this._config;
-  }
-
-  private _analysisConfig = reactive({
+  readonly config = reactive(createDefaultConfig());
+  readonly analysisConfig = reactive({
     domain: TraceDomain.WORDS,
     itemsToWatch: 10 as number | string[],
     calculationType: TraceCalculationType.STATIC,
@@ -58,99 +54,40 @@ class Store {
     competSlope: 4,
     excludeSilence: false,
   });
-  get analysisConfig() {
-    return this._analysisConfig;
-  }
-
-  private _sortedPhonemes = computed(() =>
+  readonly sortedPhonemes = computed(() =>
     [...this.config.phonology].sort((a, b) => a.label.localeCompare(b.label))
   );
-  get sortedPhonemes() {
-    return this._sortedPhonemes;
-  }
-
-  private _sim = ref<TraceSim | null>(null);
-  get sim() {
-    return this._sim;
-  }
-
-  private _cyclesToCalculate = ref(60);
-  get cyclesToCalculate() {
-    return this._cyclesToCalculate;
-  }
-
-  private _calculatedCycles = computed(() => this._sim.value?.getStepsRun() || 0);
-  get calculatedCycles() {
-    return this._calculatedCycles;
-  }
-
-  private _currentCycle = ref(0);
-  get currentCycle() {
-    return this._currentCycle;
-  }
-
-  private _formattedInputData = computed(() =>
-    formatData(this._sim.value?.getInputData(this._currentCycle.value))
+  readonly sim = ref<TraceSim | null>(null);
+  readonly cyclesToCalculate = ref(60);
+  readonly calculatedCycles = computed(() => this.sim.value?.getStepsRun() || 0);
+  readonly currentCycle = ref(0);
+  readonly formattedInputData = computed(() =>
+    formatData(this.sim.value?.getInputData(this.currentCycle.value))
   );
-  get formattedInputData() {
-    return this._formattedInputData;
-  }
-
-  private _formattedFeatureData = computed(() =>
-    formatData(this._sim.value?.getFeatureData(this._currentCycle.value))
+  readonly formattedFeatureData = computed(() =>
+    formatData(this.sim.value?.getFeatureData(this.currentCycle.value))
   );
-  get formattedFeatureData() {
-    return this._formattedFeatureData;
-  }
-
-  private _formattedPhonemeData = computed(() =>
-    formatData(this._sim.value?.getPhonemeData(this._currentCycle.value))
+  readonly formattedPhonemeData = computed(() =>
+    formatData(this.sim.value?.getPhonemeData(this.currentCycle.value))
   );
-  get formattedPhonemeData() {
-    return this._formattedPhonemeData;
-  }
-
-  private _formattedWordData = computed(() =>
-    formatData(this._sim.value?.getWordData(this._currentCycle.value))
+  readonly formattedWordData = computed(() =>
+    formatData(this.sim.value?.getWordData(this.currentCycle.value))
   );
-  get formattedWordData() {
-    return this._formattedWordData;
-  }
-
-  private _formattedLevelsAndFlowData = computed(() =>
+  readonly formattedLevelsAndFlowData = computed(() =>
     formatData(
-      this._sim.value
+      this.sim.value
         ?.getAllLevelsAndFlowData()
         .map(([data], index) => [index, ...data.map((num) => num.toFixed(13).padEnd(18, ' '))])
     )
   );
-  get formattedLevelsAndFlowData() {
-    return this._formattedLevelsAndFlowData;
-  }
-
-  private _analysisData = ref<any[]>([]);
-  get analysisData() {
-    return this._analysisData;
-  }
-
-  private _formattedAnalysisData = computed(() => formatAnalysis(this._analysisData.value, true));
-  get formattedAnalysisData() {
-    return this._formattedAnalysisData;
-  }
-
-  private _useBoxChart = ref(false);
-  get useBoxChart() {
-    return this._useBoxChart;
-  }
-
-  private _isModelInputValid = ref(true);
-  get isModelInputValid() {
-    return this._isModelInputValid;
-  }
+  readonly analysisData = ref<any[]>([]);
+  readonly formattedAnalysisData = computed(() => formatAnalysis(this.analysisData.value, true));
+  readonly useBoxChart = ref(false);
+  readonly isModelInputValid = ref(true);
 
   updateAnalysis() {
     // TODO: fix TraceSim typing
-    this._analysisData.value = doSimAnalysis({
+    this.analysisData.value = doSimAnalysis({
       ...this.analysisConfig,
       sim: this.sim.value as any,
     }).map((x, idx) => ({
@@ -162,28 +99,28 @@ class Store {
   }
 
   runSimulation() {
-    this._isModelInputValid.value = true;
+    this.isModelInputValid.value = true;
     try {
       // create a copy of the config object
       // trace.js accesses the object a lot, and it's a lot slower if it's
       // a reactive proxy.
-      const configCopy = JSON.parse(JSON.stringify(this._config));
+      const configCopy = JSON.parse(JSON.stringify(this.config));
 
       console.time('trace.js');
       const sim = new TraceSim(configCopy);
-      sim.cycle(this._cyclesToCalculate.value);
+      sim.cycle(this.cyclesToCalculate.value);
       console.timeEnd('trace.js');
 
-      this._currentCycle.value = Math.min(
+      this.currentCycle.value = Math.min(
         Math.max(this.currentCycle.value, 0),
-        this._calculatedCycles.value
+        this.calculatedCycles.value
       );
-      this._sim.value = sim;
+      this.sim.value = sim;
 
       this.updateAnalysis();
     } catch (e) {
       if (e instanceof ModelInputError) {
-        this._isModelInputValid.value = false;
+        this.isModelInputValid.value = false;
       }
       throw e;
     }
