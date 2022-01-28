@@ -63,11 +63,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, effect, ref } from 'vue';
 import FileSaver from 'file-saver';
 import JSZip from '@progress/jszip-esm';
-
 import { getStore } from '../store';
+import { MAXIMUM_NUM_CYCLES } from '../constants';
 
 const serializeData = (data: any[][][]) => {
   const numRows = data[0]?.length || 0;
@@ -112,16 +112,20 @@ export default defineComponent({
       }
     };
 
+    // every time the "cyclesToCalculate" value updates, clamp it to the maximum
+    // allowed value.
+    effect(() => {
+      store.cyclesToCalculate.value = Math.min(
+        Math.max(Number(store.cyclesToCalculate.value), 0),
+        MAXIMUM_NUM_CYCLES
+      );
+    });
+
     return {
       isModelInputValid: store.isModelInputValid,
       useBoxChart: store.useBoxChart,
       calculatedCycles: store.calculatedCycles,
-      cyclesToCalculate: computed({
-        get: () => store.cyclesToCalculate.value.toString(),
-        set: (v: string) => {
-          store.cyclesToCalculate.value = Number(v);
-        },
-      }),
+      cyclesToCalculate: store.cyclesToCalculate,
       currentCycle,
       timer,
       calculate() {
