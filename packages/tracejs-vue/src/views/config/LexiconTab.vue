@@ -1,9 +1,9 @@
 <template>
   <div style="margin: 1rem">
     <div style="display: flex; margin-bottom: 1rem">
-      <a class="button" @click="addWord" style="margin-right: 0.5rem">Add word</a>
-      <!-- <file-upload @load="loadJtLexicon" style="margin-right: 0.5rem;" />
-      <a class="button" @click="saveLexicon">Save lexicon</a> -->
+      <button class="button" @click="addWord" style="margin-right: 0.5rem">Add word</button>
+      <file-upload @load="loadJtLexicon" style="margin-right: 0.5rem" label="Load from XML" />
+      <button class="button" @click="saveLexicon">Save XML</button>
     </div>
     <table class="table is-bordered">
       <thead>
@@ -29,19 +29,36 @@
 </template>
 
 <script lang="ts">
+import FileSaver from 'file-saver';
+import { parseJtLexicon, serializeJtLexicon } from 'tracejs';
 import { computed, defineComponent } from 'vue';
-
+import FileUpload from '../../components/FileUpload.vue';
 import { getStore } from '../../store';
 
 export default defineComponent({
   name: 'LexiconTab',
+  components: { FileUpload },
   setup() {
     const store = getStore();
     const lexicon = computed(() => store.config.lexicon);
     const addWord = () => lexicon.value.unshift({ phon: '', freq: 0, prime: 0 });
     const deleteWord = (idx: number) => lexicon.value.splice(idx, 1);
     const deleteAll = () => lexicon.value.splice(0, lexicon.value.length);
-    return { lexicon, addWord, deleteWord, deleteAll };
+    const loadJtLexicon = (xmlText: string) =>
+      lexicon.value.splice(0, lexicon.value.length, ...parseJtLexicon(xmlText));
+    const saveLexicon = () =>
+      FileSaver.saveAs(
+        new Blob([serializeJtLexicon(store.config.lexicon)], { type: 'application/xml' }),
+        'lexicon.jt'
+      );
+    return {
+      lexicon,
+      addWord,
+      deleteWord,
+      deleteAll,
+      loadJtLexicon,
+      saveLexicon,
+    };
   },
 });
 </script>

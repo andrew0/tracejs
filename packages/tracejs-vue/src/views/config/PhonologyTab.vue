@@ -1,9 +1,9 @@
 <template>
   <div style="margin: 1rem">
-    <!-- <div style="display: flex; margin-bottom: 1rem;">
-      <file-upload @load="loadJtPhonology" style="margin-right: 0.5rem;" />
-      <a class="button" @click="savePhonology">Save lexicon</a>
-    </div> -->
+    <div style="display: flex; margin-bottom: 1rem">
+      <file-upload @load="loadJtPhonology" style="margin-right: 0.5rem" label="Load from XML" />
+      <button class="button" @click="savePhonology">Save XML</button>
+    </div>
     <div class="columns">
       <div class="column is-2">
         <div class="panel is-hoverable" style="background: white">
@@ -82,14 +82,16 @@
 </template>
 
 <script lang="ts">
-import { createDefaultPhoneme } from 'tracejs';
-import { computed, defineComponent, ref } from 'vue';
-
+import FileSaver from 'file-saver';
+import { createDefaultPhoneme, parseJtPhonology, serializeJtPhonology } from 'tracejs';
+import { defineComponent, ref } from 'vue';
+import FileUpload from '../../components/FileUpload.vue';
 import { CONTINUA, NUM_FEATURES } from '../../constants';
 import { getStore } from '../../store';
 
 export default defineComponent({
   name: 'PhonologyTab',
+  components: { FileUpload },
   setup() {
     const store = getStore();
 
@@ -118,6 +120,19 @@ export default defineComponent({
       activePhoneme,
       addPhoneme,
       deleteSelected,
+      loadJtPhonology(xmlText: string) {
+        store.config.phonology.splice(
+          0,
+          store.config.phonology.length,
+          ...parseJtPhonology(xmlText)
+        );
+      },
+      savePhonology() {
+        const blob = new Blob([serializeJtPhonology(store.config.phonology)], {
+          type: 'application/xml',
+        });
+        FileSaver.saveAs(blob, 'phonology.jt');
+      },
     };
   },
 });
