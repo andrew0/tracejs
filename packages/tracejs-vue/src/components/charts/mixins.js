@@ -99,7 +99,7 @@ export const reactiveProp = {
     'ylabels:update',
     'chart:update',
     'chart:destroy',
-    'chart:render'
+    'chart:render',
   ],
   watch: {
     chartData: dataHandler,

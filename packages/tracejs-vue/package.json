@@ -2,8 +2,9 @@
   "name": "tracejs-vue",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
+    "dev": "vite",
+    "lint": "prettier --write 'src/**/*'",
     "serve": "vite preview"
   },
   "dependencies": {
