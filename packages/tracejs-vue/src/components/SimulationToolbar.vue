@@ -147,11 +147,10 @@ export default defineComponent({
         }
 
         const zip = new JSZip();
-        const { input, feature, phoneme, word } = sim.getSimData();
-        zip.file('input.csv', serializeData(input));
-        zip.file('feature.csv', serializeData(feature));
-        zip.file('phoneme.csv', serializeData(phoneme));
-        zip.file('word.csv', serializeData(word));
+        zip.file('input.csv', sim.serializeInputData());
+        zip.file('feature.csv', sim.serializeFeatureData());
+        zip.file('phoneme.csv', sim.serializePhonemeData());
+        zip.file('word.csv', sim.serializeWordData());
         FileSaver.saveAs(await zip.generateAsync({ type: 'blob' }), 'tracejs-sim.zip');
       },
     };
