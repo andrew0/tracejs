@@ -12,7 +12,7 @@
     </div>
     <div class="field-body">
       <div class="field">
-        <input class="input" :type="type" :value="modelValue" @input="onInput" />
+        <input class="input" :type="type" :value="modelValue" @change="onChange" />
         <p class="help is-info">{{ note }}</p>
         <p class="help is-danger" v-if="error">
           <span class="has-text-weight-bold">ERROR</span> {{ error }}
@@ -56,7 +56,7 @@ export default defineComponent({
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     return {
-      onInput: (evt: any) => {
+      onChange: (evt: any) => {
         const value = props.type === 'number' ? Number(evt.target.value) : evt.target.value;
         emit('update:modelValue', value);
       },
