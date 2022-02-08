@@ -3,6 +3,6 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/tracejs',
+  base: '/tracejs/',
   plugins: [vue()]
 })
