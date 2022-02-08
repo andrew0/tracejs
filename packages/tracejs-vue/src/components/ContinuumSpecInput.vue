@@ -10,7 +10,14 @@
       </label>
 
       <div class="field" style="margin-right: 10px">
-        <input class="input" type="number" v-model="steps" min="0" :disabled="!enabled" />
+        <input
+          class="input"
+          type="number"
+          v-model.number="steps"
+          min="1"
+          max="9"
+          :disabled="!enabled"
+        />
         <p class="help is-info">Number of steps</p>
       </div>
 
@@ -39,45 +46,41 @@
 import { computed, defineComponent, ref, watchEffect } from 'vue';
 import { getStore } from '../store';
 
-const replaceAt = (str: string, index: number, replacement: string) =>
-  str.substr(0, index) + replacement + str.substr(index + replacement.length);
+interface ContinuumSpec {
+  from: string;
+  to: string;
+  steps: number;
+}
+
+const specToString = (spec: ContinuumSpec) => `${spec.from}${spec.to}${spec.steps}`;
+
+const specFromString = (str: string) =>
+  str.length === 3 ? { from: str[0], to: str[1], steps: Number(str[3]) } : undefined;
 
 export default defineComponent({
   name: 'ContinuumSpecInput',
   setup() {
     const store = getStore();
     const enabled = ref(false);
-    const compiledSpec = ref(store.config.continuumSpec);
-    const from = computed({
-      get() {
-        return compiledSpec.value[0] || '';
-      },
-      set(val: string) {
-        compiledSpec.value = replaceAt(compiledSpec.value, 0, val);
-      },
-    });
-    const to = computed({
-      get() {
-        return compiledSpec.value[1] || '';
-      },
-      set(val: string) {
-        compiledSpec.value = replaceAt(compiledSpec.value, 1, val);
-      },
-    });
-    const steps = computed({
-      get() {
-        return parseInt(compiledSpec.value[2], 10) || 1;
-      },
-      set(val: number) {
-        compiledSpec.value = replaceAt(compiledSpec.value, 0, val.toString());
-      },
-    });
+    const existingSpec = specFromString(store.config.continuumSpec);
+    const sortedPhons = computed(() => store.sortedPhonemes.value.map((phon) => phon.label));
+
+    const from = ref(existingSpec?.from ?? sortedPhons.value[0]);
+    const to = ref(existingSpec?.to ?? sortedPhons.value[1] ?? sortedPhons.value[0]);
+    const steps = ref(existingSpec?.steps ?? 1);
+    const compiledSpec = computed(() =>
+      from.value != null && to.value != null && steps.value != null
+        ? specToString({ from: from.value, to: to.value, steps: steps.value })
+        : ''
+    );
+
     watchEffect(() => {
       // update the config whenever spec is updated, or it is enabled/disabled
       store.config.continuumSpec = enabled.value ? compiledSpec.value : '';
     });
+
     return {
-      sortedPhons: computed(() => store.sortedPhonemes.value.map((phon) => phon.label)),
+      sortedPhons,
       enabled,
       from,
       to,
