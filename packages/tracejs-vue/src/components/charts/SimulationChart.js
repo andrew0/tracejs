@@ -1,6 +1,6 @@
-import '../../chart-controllers/chartjs-chart-matrix';
 import Chart from 'chart.js';
 import { defineComponent } from 'vue';
+import '../../chart-controllers/chartjs-chart-matrix';
 import { generateChart } from './BaseChart';
 
 export default defineComponent({

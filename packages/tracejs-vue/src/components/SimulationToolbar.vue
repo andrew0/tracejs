@@ -63,22 +63,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, effect, ref } from 'vue';
-import FileSaver from 'file-saver';
 import JSZip from '@progress/jszip-esm';
-import { getStore } from '../store';
+import FileSaver from 'file-saver';
+import { computed, defineComponent, effect, ref } from 'vue';
 import { MAXIMUM_NUM_CYCLES } from '../constants';
-
-const serializeData = (data: any[][][]) => {
-  const numRows = data[0]?.length || 0;
-  const allCycles: any[][] = [];
-  for (let row = 0; row < numRows; row++) {
-    for (let cycle = 0; cycle < data.length; cycle++) {
-      allCycles.push([cycle, ...data[cycle][row]]);
-    }
-  }
-  return allCycles.map((row) => row.join(', ')).join('\n');
-};
+import { getStore } from '../store';
 
 export default defineComponent({
   name: 'SimulationToolbar',

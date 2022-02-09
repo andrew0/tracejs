@@ -13,13 +13,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
 import { TraceNet } from 'tracejs';
-
-// @ts-ignore
-import SimulationChart from './SimulationChart';
+import { computed, defineComponent } from 'vue';
 import { CONTINUA, NUM_FEATURES } from '../../constants';
 import { getStore } from '../../store';
+// @ts-ignore
+import SimulationChart from './SimulationChart';
 
 export default defineComponent({
   components: { SimulationChart },

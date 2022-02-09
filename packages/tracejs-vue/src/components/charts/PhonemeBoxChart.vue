@@ -12,10 +12,9 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-
+import { getStore } from '../../store';
 // @ts-ignore
 import BoxChart from './BoxChart';
-import { getStore } from '../../store';
 
 export default defineComponent({
   components: { BoxChart },

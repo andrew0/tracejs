@@ -1,5 +1,5 @@
-import '../../chart-controllers/chartjs-box.js';
 import { defineComponent } from 'vue';
+import '../../chart-controllers/chartjs-box.js';
 import { generateChart } from './BaseChart';
 
 const colorPalette = [

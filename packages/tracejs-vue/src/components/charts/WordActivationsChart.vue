@@ -14,10 +14,9 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-
+import { getStore } from '../../store';
 // @ts-ignore
 import SimulationChart from './SimulationChart';
-import { getStore } from '../../store';
 
 export default defineComponent({
   components: { SimulationChart },

@@ -11,14 +11,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
-
+import { computed, defineComponent, ref } from 'vue';
 import NavigationTabs from '../components/NavigationTabs.vue';
+import { getStore } from '../store';
+import LexiconTab from './config/LexiconTab.vue';
 import ParametersTab from './config/ParametersTab.vue';
 import PhonologyTab from './config/PhonologyTab.vue';
-import LexiconTab from './config/LexiconTab.vue';
-
-import { getStore } from '../store';
 
 export default defineComponent({
   name: 'ConfigTab',

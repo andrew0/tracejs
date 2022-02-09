@@ -247,11 +247,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-
+import { computed, defineComponent } from 'vue';
+import ModelInputChart from '../../components/charts/ModelInputChart.vue';
 import ConfigInput from '../../components/ConfigInput.vue';
 import ContinuumSpecInput from '../../components/ContinuumSpecInput.vue';
-import ModelInputChart from '../../components/charts/ModelInputChart.vue';
 import { getStore } from '../../store';
 
 export default defineComponent({

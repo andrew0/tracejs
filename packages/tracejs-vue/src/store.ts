@@ -1,18 +1,17 @@
 import hashsum from 'hash-sum';
 import {
-  TraceSim,
   createDefaultConfig,
-  formatAnalysis,
   doSimAnalysis,
+  formatAnalysis,
+  ModelInputError,
   TraceCalculationType,
   TraceChoice,
   TraceCompetitionType,
   TraceDomain,
-  ModelInputError,
+  TraceSim,
 } from 'tracejs';
 import TraceConfig from 'tracejs/dist/esm/trace-param';
-
-import { reactive, ref, provide, inject, computed } from 'vue';
+import { computed, inject, provide, reactive, ref } from 'vue';
 
 // format data as tab separated values
 const formatData = (data?: (string | number)[][]) =>

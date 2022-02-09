@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, computed, ComputedRef } from 'vue';
+import { computed, ComputedRef, defineAsyncComponent, defineComponent, ref } from 'vue';
 import NavigationTabs from './components/NavigationTabs.vue';
 import { createStore } from './store';
 

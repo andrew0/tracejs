@@ -15,11 +15,10 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-
-import SimulationToolbar from '../components/SimulationToolbar.vue';
 import AnalysisConfig from '../components/AnalysisConfig.vue';
 // @ts-ignore
 import AnalysisChart from '../components/charts/AnalysisChart';
+import SimulationToolbar from '../components/SimulationToolbar.vue';
 import { getStore } from '../store';
 
 export default defineComponent({

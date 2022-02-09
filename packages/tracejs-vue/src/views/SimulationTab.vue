@@ -23,15 +23,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
-import SimulationToolbar from '../components/SimulationToolbar.vue';
 import FeatureActivationsChart from '../components/charts/FeatureActivationsChart.vue';
-import WordActivationsChart from '../components/charts/WordActivationsChart.vue';
-import WordBoxChart from '../components/charts/WordBoxChart.vue';
 import ModelInputChart from '../components/charts/ModelInputChart.vue';
 import PhonemeActivationsChart from '../components/charts/PhonemeActivationsChart.vue';
 import PhonemeBoxChart from '../components/charts/PhonemeBoxChart.vue';
+import WordActivationsChart from '../components/charts/WordActivationsChart.vue';
+import WordBoxChart from '../components/charts/WordBoxChart.vue';
 import ConfigInput from '../components/ConfigInput.vue';
+import SimulationToolbar from '../components/SimulationToolbar.vue';
 import { getStore } from '../store';
 
 export default defineComponent({

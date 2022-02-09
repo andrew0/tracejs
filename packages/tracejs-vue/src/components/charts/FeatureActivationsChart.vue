@@ -14,11 +14,10 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-
-// @ts-ignore
-import SimulationChart from './SimulationChart';
 import { CONTINUA, NUM_FEATURES } from '../../constants';
 import { getStore } from '../../store';
+// @ts-ignore
+import SimulationChart from './SimulationChart';
 
 export default defineComponent({
   components: { SimulationChart },

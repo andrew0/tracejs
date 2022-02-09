@@ -136,15 +136,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watchEffect } from 'vue';
 import {
-  TraceDomain,
-  TraceContentType,
   TraceCalculationType,
-  TraceCompetitionType,
   TraceChoice,
+  TraceCompetitionType,
+  TraceContentType,
+  TraceDomain,
   TraceWord,
 } from 'tracejs';
+import { computed, defineComponent, ref, watchEffect } from 'vue';
 import { getStore } from '../store';
 
 export default defineComponent({
