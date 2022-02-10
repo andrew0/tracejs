@@ -63,7 +63,7 @@
             <input
               type="checkbox"
               :checked="isWatchingItem(word)"
-              @change="setIsWatchingItem(word, $event.target.checked)"
+              @change="setIsWatchingItem(word, asAny($event).target.checked)"
             />
             {{ word.phon }}
           </label>
@@ -185,6 +185,10 @@ export default defineComponent({
     });
 
     return {
+      // helper for typescript errors in templates
+      // https://github.com/johnsoncodehk/volar/issues/176#issuecomment-838711592
+      asAny: (x: any) => x,
+
       store,
       simConfig,
       config,
