@@ -1,12 +1,12 @@
+import { ModelInputError } from './errors';
+import { applyRestScaling } from './response-probability';
 import TraceConfig, {
-  createDefaultConfig,
   CONTINUA_PER_FEATURE,
+  createDefaultConfig,
   NUM_FEATURES,
 } from './trace-param';
 import TracePhones from './trace-phones';
 import * as util from './util';
-import { applyRestScaling } from './response-probability';
-import { ModelInputError } from './errors';
 
 export default class TraceNet {
   private config: TraceConfig;

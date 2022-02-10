@@ -1,4 +1,4 @@
-import { TracePhone, CONTINUA_PER_FEATURE, NUM_FEATURES, TracePhoneRole } from './trace-param';
+import { CONTINUA_PER_FEATURE, NUM_FEATURES, TracePhone, TracePhoneRole } from './trace-param';
 import * as util from './util';
 
 interface TracePhoneInternal extends TracePhone {

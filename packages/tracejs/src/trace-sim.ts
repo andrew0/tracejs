@@ -3,7 +3,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Writable } from 'stream';
-
 import TraceSimBase from './trace-sim-base';
 
 function writeFile(filepath: string, data: any[][][]) {

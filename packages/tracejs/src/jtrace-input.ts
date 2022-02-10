@@ -3,7 +3,7 @@
  * TRACE.js can understand
  */
 import { parse } from 'fast-xml-parser';
-import { TraceWord, TracePhone, TracePhoneRole } from './trace-param';
+import { TracePhone, TracePhoneRole, TraceWord } from './trace-param';
 
 export const parseJtLexicon = (xmlString: string): TraceWord[] => {
   const parsed = parse(xmlString);

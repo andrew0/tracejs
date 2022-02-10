@@ -1,5 +1,4 @@
 import { Writable } from 'stream';
-
 import TraceNet from './trace-net';
 import TraceConfig, { createDefaultConfig } from './trace-param';
 import TracePhones from './trace-phones';
