@@ -8,8 +8,6 @@ export enum TracePhoneRole {
 /**
  * POW, VOC, DIF, ACU, GRD, VOI, BR
  */
-export const CONTINUA_PER_FEATURE = 7
-export const NUM_FEATURES = 9
 export interface TracePhone {
   label: string
   features: number[]
@@ -76,6 +74,8 @@ export interface TraceAllophoneRelation {
 }
 
 export default interface TraceConfig {
+  continuaPerFeature: number;
+  numFeatures: number;
   user?: string
   dateTime?: string
   comment?: string
@@ -131,10 +131,10 @@ export default interface TraceConfig {
   allophoneRelations: TraceAllophoneRelation[]
 }
 
-export const createDefaultPhoneme = (): TracePhone => ({
+export const createDefaultPhoneme = (config: Pick<TraceConfig, 'numFeatures' | 'continuaPerFeature'> = createDefaultConfig()): TracePhone => ({
   label: '',
-  features: Array(NUM_FEATURES * CONTINUA_PER_FEATURE).fill(0),
-  durationScalar: Array(CONTINUA_PER_FEATURE).fill(1),
+  features: Array(config.numFeatures * config.continuaPerFeature).fill(0),
+  durationScalar: Array(config.continuaPerFeature).fill(1),
   phonologicalRole: TracePhoneRole.NORMAL,
 })
 
@@ -143,6 +143,8 @@ export const createDefaultPhoneme = (): TracePhone => ({
  * instead of a const to prevent reference from getting mutated.
  */
 export const createDefaultConfig = (): TraceConfig => ({
+  continuaPerFeature: 7,
+  numFeatures: 9,
   modelInput: '-^br^pt-',
   spread: [6, 6, 6, 6, 6, 6, 6],
   spreadScale: [1, 1, 1, 1, 1, 1, 1],

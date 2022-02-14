@@ -113,7 +113,10 @@ export default defineComponent({
     const activePhoneme = ref(sortedPhonemes.value[0]);
 
     const addPhoneme = () => {
-      const phoneme = createDefaultPhoneme();
+      const phoneme = createDefaultPhoneme({
+        continuaPerFeature: CONTINUA.length,
+        numFeatures: NUM_FEATURES,
+      });
       store.config.phonology.push(phoneme);
       activePhoneme.value = phoneme;
     };

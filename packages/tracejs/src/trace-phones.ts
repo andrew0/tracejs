@@ -1,4 +1,4 @@
-import { CONTINUA_PER_FEATURE, NUM_FEATURES, TracePhone, TracePhoneRole } from './trace-param';
+import TraceConfig, { TracePhone, TracePhoneRole } from './trace-param';
 import * as util from './util';
 
 interface TracePhoneInternal extends TracePhone {
@@ -13,9 +13,9 @@ export default class TracePhones {
   private phonemes: TracePhoneInternal[];
   private ambiguousPhonemes: TracePhoneInternal[] = [];
 
-  constructor(phonemes: TracePhone[]) {
+  constructor(private config: TraceConfig) {
     // create a copy of the phonemes
-    this.phonemes = phonemes.map((x: TracePhone): TracePhoneInternal => ({ ...x }));
+    this.phonemes = config.phonology.map((x: TracePhone): TracePhoneInternal => ({ ...x }));
     // sort the phonemes by label
     this.sortPhonemes();
   }
@@ -91,13 +91,20 @@ export default class TracePhones {
     const computeSpread = (phons: TracePhoneInternal[]) => {
       // loop over phonemes
       for (const phon of phons) {
-        phon.spread = util.zeros2D(NUM_FEATURES * CONTINUA_PER_FEATURE, maxspread * 4);
+        phon.spread = util.zeros2D(
+          this.config.numFeatures * this.config.continuaPerFeature,
+          maxspread * 4
+        );
         phon.norm = 0;
 
         // loop over continuum
-        for (let cont = 0; cont < NUM_FEATURES * CONTINUA_PER_FEATURE; cont++) {
+        for (
+          let cont = 0;
+          cont < this.config.numFeatures * this.config.continuaPerFeature;
+          cont++
+        ) {
           if (phon.features[cont] > 0) {
-            const spreadSteps = Math.floor(cont / NUM_FEATURES);
+            const spreadSteps = Math.floor(cont / this.config.numFeatures);
 
             // delta is the amount to ramp up/down
             const delta =
@@ -138,12 +145,12 @@ export default class TracePhones {
     }
 
     const incr_phon = [];
-    for (let cont = 0; cont < NUM_FEATURES * CONTINUA_PER_FEATURE; cont++) {
+    for (let cont = 0; cont < this.config.numFeatures * this.config.continuaPerFeature; cont++) {
       incr_phon[cont] = (phon_to.features[cont] - phon_from.features[cont]) / (steps - 1);
     }
 
     const incr_dur = [];
-    for (let cont = 0; cont < CONTINUA_PER_FEATURE; cont++) {
+    for (let cont = 0; cont < this.config.continuaPerFeature; cont++) {
       incr_dur[cont] =
         (phon_to.durationScalar[cont] - phon_from.durationScalar[cont]) / (steps - 1);
     }
@@ -153,13 +160,13 @@ export default class TracePhones {
     for (let i = 0; i < steps; i++) {
       // loop over continuoum
       const features: number[] = [];
-      for (let cont = 0; cont < NUM_FEATURES * CONTINUA_PER_FEATURE; cont++) {
+      for (let cont = 0; cont < this.config.numFeatures * this.config.continuaPerFeature; cont++) {
         // continuum value is calculated as ith step in cont difference between ambigFrom to ambigTo:
         features[cont] = phon_from.features[cont] + i * incr_phon[cont];
       }
 
       const durationScalar: number[] = [];
-      for (let cont = 0; cont < CONTINUA_PER_FEATURE; cont++) {
+      for (let cont = 0; cont < this.config.continuaPerFeature; cont++) {
         // continuum value is calculated as ith step in cont difference between ambigFrom to ambigTo:
         durationScalar[cont] = phon_from.durationScalar[cont] + i * incr_dur[cont];
       }

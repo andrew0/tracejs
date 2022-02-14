@@ -1,10 +1,6 @@
 import { ModelInputError } from './errors';
 import { applyRestScaling } from './response-probability';
-import TraceConfig, {
-  CONTINUA_PER_FEATURE,
-  createDefaultConfig,
-  NUM_FEATURES,
-} from './trace-param';
+import TraceConfig, { createDefaultConfig } from './trace-param';
 import TracePhones from './trace-phones';
 import * as util from './util';
 
@@ -46,7 +42,7 @@ export default class TraceNet {
 
   constructor(config: TraceConfig = createDefaultConfig()) {
     this.config = config;
-    this.phonemes = new TracePhones(this.config.phonology);
+    this.phonemes = new TracePhones(this.config);
     this.reset();
   }
 
@@ -57,9 +53,18 @@ export default class TraceNet {
     //System.out.println("length_normalization_scale:"+length_normalization_scale)
     this.inputSlice = 0;
 
-    this.inputLayer = util.zeros2D(CONTINUA_PER_FEATURE * NUM_FEATURES, this.config.fSlices);
-    this.featLayer = util.zeros2D(CONTINUA_PER_FEATURE * NUM_FEATURES, this.config.fSlices);
-    this.featNet = util.zeros2D(CONTINUA_PER_FEATURE * NUM_FEATURES, this.config.fSlices);
+    this.inputLayer = util.zeros2D(
+      this.config.continuaPerFeature * this.config.numFeatures,
+      this.config.fSlices
+    );
+    this.featLayer = util.zeros2D(
+      this.config.continuaPerFeature * this.config.numFeatures,
+      this.config.fSlices
+    );
+    this.featNet = util.zeros2D(
+      this.config.continuaPerFeature * this.config.numFeatures,
+      this.config.fSlices
+    );
     this.phonLayer = util.zeros2D(this.config.phonology.length, this.getPSlices());
     this.phonNet = util.zeros2D(this.config.phonology.length, this.getPSlices());
     this.wordLayer = util.zeros2D(this.config.lexicon.length, this.getPSlices());
@@ -67,11 +72,11 @@ export default class TraceNet {
 
     this.pww = util.zeros2D(this.config.phonology.length, 4);
     this.wpw = util.zeros2D(this.config.phonology.length, 4);
-    this.fpw = util.zeros3D(this.config.phonology.length, CONTINUA_PER_FEATURE, 0);
-    this.pfw = util.zeros3D(this.config.phonology.length, CONTINUA_PER_FEATURE, 0);
+    this.fpw = util.zeros3D(this.config.phonology.length, this.config.continuaPerFeature, 0);
+    this.pfw = util.zeros3D(this.config.phonology.length, this.config.continuaPerFeature, 0);
 
     for (let p = 0; p < this.config.phonology.length; p++) {
-      for (let c = 0; c < CONTINUA_PER_FEATURE; c++) {
+      for (let c = 0; c < this.config.continuaPerFeature; c++) {
         this.fpw[p][c] = Array(this.config.spread[c] * 2).fill(0);
         this.pfw[p][c] = Array(this.config.spread[c] * 2).fill(0);
       }
@@ -99,7 +104,7 @@ export default class TraceNet {
     // init feature layer to resting value
     let rest = this.clamp(this.config.rest.F || 0);
     for (let fslice = 0; fslice < this.config.fSlices; fslice++) {
-      for (let feat = 0; feat < CONTINUA_PER_FEATURE * NUM_FEATURES; feat++) {
+      for (let feat = 0; feat < this.config.continuaPerFeature * this.config.numFeatures; feat++) {
         this.featLayer[feat][fslice] = rest;
       }
     }
@@ -172,7 +177,7 @@ export default class TraceNet {
     // how much can a feature influence a phoneme if there are mis-aligned.
     // these arrays state how much to scale down per offset slice.
     for (let phon = 0; phon < this.config.phonology.length; phon++) {
-      for (let cont = 0; cont < CONTINUA_PER_FEATURE; cont++) {
+      for (let cont = 0; cont < this.config.continuaPerFeature; cont++) {
         let denom = 0;
         const spr = this.config.spread[cont] * 1; // 1 is stand in for pp->wscale (?)
         const ispr = Math.floor(spr);
@@ -244,7 +249,11 @@ export default class TraceNet {
           t < inputOffset + splicePoint;
           t++, phonOffset++
         ) {
-          for (let cont = 0; cont < NUM_FEATURES * CONTINUA_PER_FEATURE; cont++) {
+          for (
+            let cont = 0;
+            cont < this.config.numFeatures * this.config.continuaPerFeature;
+            cont++
+          ) {
             if (t >= 0 && t < this.config.fSlices) {
               this.inputLayer[cont][t] += p1.spread[cont][phonOffset];
             }
@@ -257,7 +266,11 @@ export default class TraceNet {
           t < inputOffset + p2.spreadOffset * 2;
           t++, phonOffset++
         ) {
-          for (let cont = 0; cont < NUM_FEATURES * CONTINUA_PER_FEATURE; cont++) {
+          for (
+            let cont = 0;
+            cont < this.config.numFeatures * this.config.continuaPerFeature;
+            cont++
+          ) {
             if (t >= 0 && t < this.config.fSlices) {
               this.inputLayer[cont][t] += p2.spread[cont][phonOffset];
             }
@@ -281,7 +294,11 @@ export default class TraceNet {
           t < inputOffset + Math.round(phon.spreadOffset * 2);
           t++, phonOffset++
         ) {
-          for (let cont = 0; cont < NUM_FEATURES * CONTINUA_PER_FEATURE; cont++) {
+          for (
+            let cont = 0;
+            cont < this.config.numFeatures * this.config.continuaPerFeature;
+            cont++
+          ) {
             if (t >= 0 && t < this.config.fSlices) {
               this.inputLayer[cont][t] += phon.spread[cont][phonOffset];
             }
@@ -294,7 +311,7 @@ export default class TraceNet {
 
     // apply input noise here.
     if (this.config.noiseSD != 0) {
-      for (let feat = 0; feat < NUM_FEATURES * CONTINUA_PER_FEATURE; feat++) {
+      for (let feat = 0; feat < this.config.numFeatures * this.config.continuaPerFeature; feat++) {
         for (let islice = 0; islice < this.config.fSlices; islice++) {
           this.inputLayer[feat][islice] += util.gauss(0.0, this.config.noiseSD);
         }
@@ -302,7 +319,7 @@ export default class TraceNet {
     }
 
     // apply clamping
-    for (let feat = 0; feat < NUM_FEATURES * CONTINUA_PER_FEATURE; feat++) {
+    for (let feat = 0; feat < this.config.numFeatures * this.config.continuaPerFeature; feat++) {
       for (let islice = 0; islice < this.config.fSlices; islice++) {
         this.inputLayer[feat][islice] = this.clamp(this.inputLayer[feat][islice]);
       }
@@ -310,9 +327,10 @@ export default class TraceNet {
 
     // the next line copies one column of data, forcing the _feature layer_ to undergo one cycle immediately.
     // this compensates for a discrepency between jTrace and cTrace; keeps things lined up.
-    for (let c = 0; c < CONTINUA_PER_FEATURE; c++) {
-      for (let f = 0; f < NUM_FEATURES; f++) {
-        this.featNet[c * NUM_FEATURES + f][0] += this.inputLayer[c * NUM_FEATURES + f][0];
+    for (let c = 0; c < this.config.continuaPerFeature; c++) {
+      for (let f = 0; f < this.config.numFeatures; f++) {
+        this.featNet[c * this.config.numFeatures + f][0] +=
+          this.inputLayer[c * this.config.numFeatures + f][0];
       }
     }
     this.featUpdate();
@@ -324,24 +342,28 @@ export default class TraceNet {
     this.globalFeatureCompetitionIndex = 0;
     // computes total inhibition coming from a continuum to each node at that time slice
     // sum of prev slice's positive activations summed over each continuum at each fslice
-    const fsum: number[][] = util.zeros2D(CONTINUA_PER_FEATURE, this.config.fSlices);
-    for (let c = 0; c < CONTINUA_PER_FEATURE; c++)
-      for (let f = 0; f < NUM_FEATURES; f++)
+    const fsum: number[][] = util.zeros2D(this.config.continuaPerFeature, this.config.fSlices);
+    for (let c = 0; c < this.config.continuaPerFeature; c++)
+      for (let f = 0; f < this.config.numFeatures; f++)
         for (let fslice = 0; fslice < this.config.fSlices; fslice++)
-          if (this.featLayer[c * NUM_FEATURES + f][fslice] > 0)
-            fsum[c][fslice] += this.featLayer[c * NUM_FEATURES + f][fslice];
+          if (this.featLayer[c * this.config.numFeatures + f][fslice] > 0)
+            fsum[c][fslice] += this.featLayer[c * this.config.numFeatures + f][fslice];
 
     // this block scales down the fsum value by Gamma.F
     //ff=[c][i]=fsum[c][i]*Gamma.F
     const ffi = fsum.map((row) => row.map((node) => node * (this.config.gamma.F || 0)));
-    /*const ffi: number[][] = util.zeros2D(CONTINUA_PER_FEATURE, this.config.fSlices)
-    for (let c = 0; c < CONTINUA_PER_FEATURE; c++)
+    /*const ffi: number[][] = util.zeros2D(this.config.continuaPerFeature, this.config.fSlices)
+    for (let c = 0; c < this.config.continuaPerFeature; c++)
       for (let fslice = 0; fslice < this.config.fSlices; fslice++)
         ffi[c][fslice] = fsum[c][fslice] * this.config.gamma.F*/
 
     // this block copies input activations to the feature layer
     if (this.inputSlice < this.config.fSlices) {
-      for (let fIndex = 0; fIndex < CONTINUA_PER_FEATURE * NUM_FEATURES; fIndex++) {
+      for (
+        let fIndex = 0;
+        fIndex < this.config.continuaPerFeature * this.config.numFeatures;
+        fIndex++
+      ) {
         for (
           let fslice = this.inputSlice + 1;
           fslice < this.config.fSlices && fslice < this.inputSlice + 1 + this.__nreps;
@@ -357,15 +379,18 @@ export default class TraceNet {
     }
 
     // this block applies ffi inhibition to each node in the featue layer, and compensates for self-inhibition
-    for (let c = 0; c < CONTINUA_PER_FEATURE; c++) {
-      for (let f = 0; f < NUM_FEATURES; f++) {
+    for (let c = 0; c < this.config.continuaPerFeature; c++) {
+      for (let f = 0; f < this.config.numFeatures; f++) {
         for (let fslice = 0; fslice < this.config.fSlices; fslice++) {
           const n = Math.max(
             0,
             ffi[c][fslice] -
-              Math.max(0, this.featLayer[c * NUM_FEATURES + f][fslice] * (this.config.gamma.F || 0))
+              Math.max(
+                0,
+                this.featLayer[c * this.config.numFeatures + f][fslice] * (this.config.gamma.F || 0)
+              )
           );
-          this.featNet[c * NUM_FEATURES + f][fslice] -= n;
+          this.featNet[c * this.config.numFeatures + f][fslice] -= n;
           this.globalFeatureCompetitionIndex += n;
         }
       }
@@ -382,7 +407,11 @@ export default class TraceNet {
     // for every feature at every slice, if the units activation is above zero,
     // then send activation to phonNet from the featLayer scaled by PhonDefs,
     // spread, fwp and alpha.
-    for (let featIndex = 0; featIndex < CONTINUA_PER_FEATURE * NUM_FEATURES; featIndex++) {
+    for (
+      let featIndex = 0;
+      featIndex < this.config.continuaPerFeature * this.config.numFeatures;
+      featIndex++
+    ) {
       for (let fslice = 0; fslice < this.config.fSlices; fslice++) {
         if (this.featLayer[featIndex][fslice] > 0) {
           // for all phonemes affected by the current feature.
@@ -394,7 +423,7 @@ export default class TraceNet {
 
             // determine, based on current slice and spread, what range of
             // phoneme units to send activation to.
-            const fspr = this.config.spread[Math.floor(featIndex / NUM_FEATURES)];
+            const fspr = this.config.spread[Math.floor(featIndex / this.config.numFeatures)];
             const fmax = this.config.fSlices - fspr;
             let pstart, pend;
             if (fslice < fspr) {
@@ -416,7 +445,7 @@ export default class TraceNet {
                 (this.config.alpha.FP || 0);
             }
 
-            const c = Math.floor(featIndex / NUM_FEATURES);
+            const c = Math.floor(featIndex / this.config.numFeatures);
             for (let pslice = pstart; pslice < pend + 1 && pslice < pSlices; pslice++) {
               //System.out.println(phon+"\t"+pslice+"\t"+phon+"\t"+c+"\t"+winstart);
               const n = this.fpw[idx][c][winstart] * t;
@@ -507,9 +536,9 @@ export default class TraceNet {
     const fpp = this.config.slicesPerPhon;
     this.globalPhonToFeatSum = 0;
     for (let fslice = 0; fslice < fSlices; fslice++) {
-      for (let cont = 0; cont < CONTINUA_PER_FEATURE; cont++) {
+      for (let cont = 0; cont < this.config.continuaPerFeature; cont++) {
         //loop over all continua (7)
-        for (let feat = 0; feat < NUM_FEATURES; feat++) {
+        for (let feat = 0; feat < this.config.numFeatures; feat++) {
           let activation = 0; //activation is basically <PFEXp,ps,c,f,fs>
           for (let phon = 0; phon < this.config.phonology.length; phon++) {
             // loop over phonemes
@@ -522,11 +551,12 @@ export default class TraceNet {
                 activation +=
                   this.pfw[phon][cont][d] *
                   this.phonLayer[phon][pslice] *
-                  (this.phonemes.byIndex(phon)?.features[cont * NUM_FEATURES + feat] || 0);
+                  (this.phonemes.byIndex(phon)?.features[cont * this.config.numFeatures + feat] ||
+                    0);
             }
           }
           const n = (this.config.alpha.PF || 0) * activation;
-          this.featNet[cont * NUM_FEATURES + feat][fslice] += n;
+          this.featNet[cont * this.config.numFeatures + feat][fslice] += n;
           this.globalPhonToFeatSum += n;
         }
       }
@@ -784,7 +814,7 @@ export default class TraceNet {
     this.globalFeatSumAll = 0;
     this.globalFeatSumPos = 0;
     for (let slice = 0; slice < this.config.fSlices; slice++) {
-      for (let feat = 0; feat < NUM_FEATURES * CONTINUA_PER_FEATURE; feat++) {
+      for (let feat = 0; feat < this.config.numFeatures * this.config.continuaPerFeature; feat++) {
         if (this.config.stochasticitySD) {
           //apply gaussian noise here
           this.featNet[feat][slice] += util.gauss(0.0, this.config.stochasticitySD); //this adds the noise
@@ -806,7 +836,10 @@ export default class TraceNet {
         }
       }
     }
-    this.featNet = util.zeros2D(NUM_FEATURES * CONTINUA_PER_FEATURE, this.config.fSlices);
+    this.featNet = util.zeros2D(
+      this.config.numFeatures * this.config.continuaPerFeature,
+      this.config.fSlices
+    );
   }
 
   /**
