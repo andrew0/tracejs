@@ -1,8 +1,14 @@
 <template>
   <div style="margin: 1rem">
+    <div class="notification is-danger" v-if="errors.length">
+      <button class="delete" @click="clearErrors"></button>
+      <span v-for="err in errors">{{ err }}</span>
+    </div>
     <div style="display: flex; margin-bottom: 1rem">
       <file-upload @load="loadJtPhonology" style="margin-right: 0.5rem" label="Load from XML" />
-      <button class="button" @click="savePhonology">Save XML</button>
+      <button class="button" @click="savePhonology" style="margin-right: 0.5rem">Save XML</button>
+      <file-upload @load="loadJsonPhonology" style="margin-right: 0.5rem" label="Load from JSON" />
+      <button class="button" @click="saveJsonPhonology">Save JSON</button>
     </div>
     <div class="columns">
       <div class="column is-2">
@@ -83,7 +89,12 @@
 
 <script lang="ts">
 import FileSaver from 'file-saver';
-import { createDefaultPhoneme, parseJtPhonology, serializeJtPhonology } from 'tracejs';
+import {
+  createDefaultPhoneme,
+  parseJsonPhonology,
+  parseJtPhonology,
+  serializeJtPhonology,
+} from 'tracejs';
 import { defineComponent, ref } from 'vue';
 import FileUpload from '../../components/FileUpload.vue';
 import { CONTINUA, NUM_FEATURES } from '../../constants';
@@ -94,6 +105,9 @@ export default defineComponent({
   components: { FileUpload },
   setup() {
     const store = getStore();
+
+    const errors = ref<string[]>([]);
+    const clearErrors = () => errors.value.splice(0, errors.value.length);
 
     const sortedPhonemes = store.sortedPhonemes;
     const activePhoneme = ref(sortedPhonemes.value[0]);
@@ -114,6 +128,8 @@ export default defineComponent({
     };
 
     return {
+      errors,
+      clearErrors,
       continua: CONTINUA,
       numFeatures: NUM_FEATURES,
       sortedPhonemes,
@@ -132,6 +148,27 @@ export default defineComponent({
           type: 'application/xml',
         });
         FileSaver.saveAs(blob, 'phonology.jt');
+      },
+      loadJsonPhonology(text: string) {
+        try {
+          store.config.phonology.splice(
+            0,
+            store.config.phonology.length,
+            ...parseJsonPhonology(JSON.parse(text))
+          );
+        } catch (err: any) {
+          if (err.errors) {
+            errors.value.splice(0, errors.value.length, ...err.errors);
+          } else {
+            errors.value.splice(0, errors.value.length, err.message);
+          }
+        }
+      },
+      saveJsonPhonology() {
+        const blob = new Blob([JSON.stringify(store.config.phonology, null, 2) + '\n'], {
+          type: 'application/xml',
+        });
+        FileSaver.saveAs(blob, 'phonology.json');
       },
     };
   },

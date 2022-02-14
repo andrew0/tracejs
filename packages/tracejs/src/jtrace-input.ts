@@ -3,6 +3,7 @@
  * TRACE.js can understand
  */
 import { parse } from 'fast-xml-parser';
+import * as t from 'typanion';
 import { TracePhone, TracePhoneRole, TraceWord } from './trace-param';
 
 export const parseJtLexicon = (xmlString: string): TraceWord[] => {
@@ -35,4 +36,45 @@ export const parseJtPhonology = (xmlString: string): TracePhone[] => {
       phonologicalRole: TracePhoneRole.NORMAL,
     })
   );
+};
+
+const isPhonology = t.isArray(
+  t.isObject({
+    label: t.isString(),
+    features: t.isArray(t.isNumber()),
+    durationScalar: t.isArray(t.isNumber()),
+    phonologicalRole: t.isOneOf([
+      t.isLiteral(TracePhoneRole.NORMAL),
+      t.isLiteral(TracePhoneRole.AMBIG),
+      t.isLiteral(TracePhoneRole.ALLOPHONE),
+      t.isLiteral(TracePhoneRole.OTHER),
+    ]),
+  })
+);
+
+export const parseJsonPhonology = (obj: unknown): TracePhone[] => {
+  const errors: string[] = [];
+  if (isPhonology(obj, { errors })) {
+    return obj;
+  }
+
+  throw Object.assign(new Error(JSON.stringify(errors)), { errors });
+};
+
+const isLexicon = t.isArray(
+  t.isObject({
+    phon: t.isString(),
+    freq: t.isNumber(),
+    label: t.isOptional(t.isString()),
+    prime: t.isNumber(),
+  })
+);
+
+export const parseJsonLexicon = (obj: unknown): TraceWord[] => {
+  const errors: string[] = [];
+  if (isLexicon(obj, { errors })) {
+    return obj;
+  }
+
+  throw Object.assign(new Error(JSON.stringify(errors)), { errors });
 };
