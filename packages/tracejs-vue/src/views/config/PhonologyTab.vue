@@ -169,7 +169,7 @@ export default defineComponent({
       },
       saveJsonPhonology() {
         const blob = new Blob([JSON.stringify(store.config.phonology, null, 2) + '\n'], {
-          type: 'application/xml',
+          type: 'application/json',
         });
         FileSaver.saveAs(blob, 'phonology.json');
       },

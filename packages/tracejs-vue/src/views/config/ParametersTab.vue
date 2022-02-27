@@ -1,6 +1,14 @@
 <template>
+  <div class="notification is-danger" v-if="errors.length" style="margin: 1rem">
+    <button class="delete" @click="clearErrors"></button>
+    <span v-for="err in errors">{{ err }}</span>
+  </div>
   <div :class="$style.columns">
     <div style="padding: 1rem; width: 600px; overflow-y: auto">
+      <div style="display: flex; margin-bottom: 1rem">
+        <file-upload @load="loadFromJson" style="margin-right: 0.5rem" label="Load from JSON" />
+        <button class="button" @click="saveJson">Save JSON</button>
+      </div>
       <ConfigInput
         v-model="config.modelInput"
         :last-value="lastConfig.modelInput"
@@ -247,10 +255,12 @@
 </template>
 
 <script lang="ts">
+import FileSaver from 'file-saver';
 import { computed, defineComponent } from 'vue';
 import ModelInputChart from '../../components/charts/ModelInputChart.vue';
 import ConfigInput from '../../components/ConfigInput.vue';
 import ContinuumSpecInput from '../../components/ContinuumSpecInput.vue';
+import FileUpload from '../../components/FileUpload.vue';
 import { getStore } from '../../store';
 
 export default defineComponent({
@@ -258,14 +268,31 @@ export default defineComponent({
   components: {
     ConfigInput,
     ContinuumSpecInput,
+    FileUpload,
     ModelInputChart,
   },
   setup() {
     const store = getStore();
+    const errors: string[] = [];
     return {
       isModelInputValid: store.isModelInputValid,
       config: computed(() => store.config),
       lastConfig: computed(() => store.lastSimConfig.value),
+      loadFromJson: (text: string) => {
+        try {
+          Object.assign(store.config, JSON.parse(text));
+        } catch (err: any) {
+          errors.push(err.message);
+        }
+      },
+      saveJson: () => {
+        const blob = new Blob([JSON.stringify(store.config, null, 2) + '\n'], {
+          type: 'application/json',
+        });
+        FileSaver.saveAs(blob, 'config.json');
+      },
+      errors,
+      clearErrors: () => errors.splice(0, errors.length),
     };
   },
 });
