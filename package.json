@@ -6,7 +6,7 @@
     "packages/tracejs-vue"
   ],
   "scripts": {
-    "build": "yarn workspace tracejs build",
+    "build": "yarn workspaces foreach -pit run build",
     "cli": "node packages/tracejs/bin/cli.js",
     "lint": "prettier --prose-wrap=always --write '*.md' && yarn workspace tracejs lint && yarn workspace tracejs-vue lint",
     "vue-build": "yarn workspace tracejs-vue build",
