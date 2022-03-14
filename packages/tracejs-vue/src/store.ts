@@ -62,7 +62,7 @@ class Store {
   readonly lastSimConfig = ref<TraceConfig>(JSON.parse(JSON.stringify(this.config)));
   readonly lastSimConfigHash = ref<string | null>(hashsum(this.lastSimConfig.value));
   readonly isConfigChanged = computed(() => this.lastSimConfigHash.value !== hashsum(this.config));
-  readonly cyclesToCalculate = ref(60);
+  readonly cyclesToCalculate = ref(81);
   readonly calculatedCycles = computed(() => this.sim.value?.getStepsRun() || 0);
   readonly currentCycle = ref(0);
   readonly formattedInputData = computed(() =>
