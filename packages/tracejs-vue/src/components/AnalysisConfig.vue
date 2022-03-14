@@ -109,7 +109,7 @@
       <br />
       <label>
         K Value
-        <input class="input" min="0" type="number" v-model="config.kValue" style="width: 50px" />
+        <input class="input" min="0" type="number" v-model="config.kValue" style="width: 75px" />
       </label>
     </div>
 
