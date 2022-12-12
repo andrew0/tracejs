@@ -1,18 +1,20 @@
 import { TracePhone, TraceWord } from './trace-param';
 
 export const serializeJtLexicon = (lex: TraceWord[]) => {
-  let result = '<?xml version="1.0" encoding="UTF-8"?>\n<lexicon>\n';
-  for (const word of lex) {
-    let lexeme = '  <lexeme>\n';
-    if (word.label) lexeme += `    <label>${word.label}</label>\n`;
-    lexeme += `    <phonology>${word.phon}</phonology>\n`;
-    if (word.freq) lexeme += `    <frequency>${word.freq}</frequency>\n`;
-    if (word.prime) lexeme += `    <prime>${word.prime}</prime>\n`;
-    lexeme += '  </lexeme>\n';
-    result += lexeme;
-  }
-  result += '</lexicon>';
-  return result;
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<lexicon>',
+    ...lex.map((word) => [
+      '  <lexeme>',
+      ...(word.label ? [`    <label>${word.label}</label>`] : []),
+      `    <phonology>${word.phon}</phonology>`,
+      ...(word.freq ? [`    <frequency>${word.freq}</frequency>`] : []),
+      ...(word.prime ? [`    <prime>${word.prime}</prime>`] : []),
+      '  </lexeme>',
+    ]),
+    '</lexicon>',
+    '',
+  ];
 };
 
 const formatter = Intl.NumberFormat('en-US', {
@@ -23,15 +25,19 @@ const serializeNumberArray = (nums: number[]) =>
   nums.map((x: number) => formatter.format(x)).join(' ');
 
 export const serializeJtPhonology = (phonology: TracePhone[]) => {
-  let result = '<?xml version="1.0" encoding="UTF-8"?>\n<phonemes>\n';
-  for (const phon of phonology) {
-    let phoneme = '  <phoneme>\n';
-    phoneme += `    <symbol>${phon.label}</symbol>\n`;
-    phoneme += `    <features>${serializeNumberArray(phon.features)}</features>\n`;
-    phoneme += `    <durationScalar>${serializeNumberArray(phon.features)}</durationScalar>\n`;
-    phoneme += '  </phoneme>\n';
-    result += phoneme;
-  }
-  result += '</phonemes>';
-  return result;
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<phonology>',
+    '  <phonemes>',
+    ...phonology.map((phon) => [
+      '    <phoneme>',
+      `      <symbol>${phon.label}</symbol>`,
+      `      <features>${serializeNumberArray(phon.features)}</features>`,
+      `      <durationScalar>${serializeNumberArray(phon.features)}</durationScalar>`,
+      `    </phoneme>`,
+    ]),
+    '  </phonemes>',
+    '</phonology>',
+    '',
+  ].join('\n');
 };

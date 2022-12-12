@@ -27,7 +27,7 @@ const parseNumberArray = (str: string) =>
 
 export const parseJtPhonology = (xmlString: string): TracePhone[] => {
   const parsed = new XMLParser().parse(xmlString);
-  const phoneme = (parsed.phonemes && parsed.phonemes.phoneme) || [];
+  const phoneme = parsed.phonology?.phonemes?.phoneme ?? parsed.phonemes?.phoneme ?? [];
   return phoneme.map(
     (phon: any): TracePhone => ({
       label: phon.symbol,
