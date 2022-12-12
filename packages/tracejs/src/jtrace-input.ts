@@ -2,12 +2,12 @@
  * This file contains functions that import jTRACE XML files into representations that
  * TRACE.js can understand
  */
-import { parse } from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
 import * as t from 'typanion';
 import { TracePhone, TracePhoneRole, TraceWord } from './trace-param';
 
 export const parseJtLexicon = (xmlString: string): TraceWord[] => {
-  const parsed = parse(xmlString);
+  const parsed = new XMLParser().parse(xmlString);
   const lexeme = (parsed.lexicon && parsed.lexicon.lexeme) || [];
   return lexeme.map(
     (lex: any): TraceWord => ({
@@ -26,7 +26,7 @@ const parseNumberArray = (str: string) =>
     .map((x: string) => Number(x) || 0);
 
 export const parseJtPhonology = (xmlString: string): TracePhone[] => {
-  const parsed = parse(xmlString);
+  const parsed = new XMLParser().parse(xmlString);
   const phoneme = (parsed.phonemes && parsed.phonemes.phoneme) || [];
   return phoneme.map(
     (phon: any): TracePhone => ({
