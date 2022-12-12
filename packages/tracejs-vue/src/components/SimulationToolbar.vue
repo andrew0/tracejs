@@ -65,6 +65,7 @@
 <script lang="ts">
 import JSZip from '@progress/jszip-esm';
 import FileSaver from 'file-saver';
+import { getAnalysisData } from 'tracejs';
 import { computed, defineComponent, effect, ref } from 'vue';
 import { MAXIMUM_NUM_CYCLES } from '../constants';
 import { getStore } from '../store';
@@ -140,6 +141,13 @@ export default defineComponent({
         zip.file('feature.csv', sim.serializeFeatureData());
         zip.file('phoneme.csv', sim.serializePhonemeData());
         zip.file('word.csv', sim.serializeWordData());
+        zip.file('levels-and-flows.csv', sim.serializeLevelsAndFlowData());
+        zip.file(
+          'chart-data.csv',
+          getAnalysisData(store.analysisData.value, false)
+            .map((row) => row.join(','))
+            .join('\n')
+        );
         FileSaver.saveAs(await zip.generateAsync({ type: 'blob' }), 'tracejs-sim.zip');
       },
     };
