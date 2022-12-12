@@ -1,5 +1,5 @@
 <template>
-  <DataTab :data="data" />
+  <DataTab :data="data" :show-cycles="false" />
 </template>
 
 <script lang="ts">
