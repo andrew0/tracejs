@@ -179,66 +179,77 @@
         :last-value="lastConfig.spread[0]"
         label="FETSPREAD[pow]"
         note="Power feature spread"
+        :step="1"
       />
       <ConfigInput
         v-model="config.spread[1]"
         :last-value="lastConfig.spread[1]"
         label="FETSPREAD[voc]"
         note="Vocalic feature spread"
+        :step="1"
       />
       <ConfigInput
         v-model="config.spread[2]"
         :last-value="lastConfig.spread[2]"
         label="FETSPREAD[dif]"
         note="Diffuse feature spread"
+        :step="1"
       />
       <ConfigInput
         v-model="config.spread[3]"
         :last-value="lastConfig.spread[3]"
         label="FETSPREAD[acu]"
         note="Accute feature spread"
+        :step="1"
       />
       <ConfigInput
         v-model="config.spread[4]"
         :last-value="lastConfig.spread[4]"
         label="FETSPREAD[gra]"
         note="Gradient/Consonental feature spread"
+        :step="1"
       />
       <ConfigInput
         v-model="config.spread[5]"
         :last-value="lastConfig.spread[5]"
         label="FETSPREAD[voi]"
         note="Voiced feature spread"
+        :step="1"
       />
       <ConfigInput
         v-model="config.spread[6]"
         :last-value="lastConfig.spread[6]"
         label="FETSPREAD[bur]"
         note="Burst feature spread"
+        :step="1"
       />
       <ConfigInput
         v-model="config.fSlices"
         :last-value="lastConfig.fSlices"
         label="fSlices"
         note="Number of time steps"
+        :step="1"
       />
       <ConfigInput
         v-model="config.deltaInput"
         :last-value="lastConfig.deltaInput"
         label="deltaInput"
         note="Input phoneme interval"
+        :step="1"
       />
       <ConfigInput
         v-model="config.nreps"
         :last-value="lastConfig.nreps"
         label="nreps"
         note="Input presentation rate"
+        :step="1"
       />
       <ConfigInput
         v-model="config.slicesPerPhon"
         :last-value="lastConfig.slicesPerPhon"
         label="slicesPerPhon"
         note="Phoneme/Word slices per Feature"
+        :step="1"
       />
       <ConfigInput
         v-model="config.lengthNormalization"

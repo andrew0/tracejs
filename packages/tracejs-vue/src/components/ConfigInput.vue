@@ -12,7 +12,13 @@
     </div>
     <div class="field-body">
       <div class="field">
-        <input class="input" :type="type" :value="modelValue" @change="onChange" />
+        <input
+          class="input"
+          :type="type"
+          :step="type === 'number' ? step : undefined"
+          :value="modelValue"
+          @change="onChange"
+        />
         <p class="help is-info">{{ note }}</p>
         <p class="help is-danger" v-if="error">
           <span class="has-text-weight-bold">ERROR</span> {{ error }}
@@ -51,6 +57,10 @@ export default defineComponent({
     type: {
       type: String as PropType<'text' | 'number'>,
       default: 'number',
+    },
+    step: {
+      type: Number,
+      default: 0.1,
     },
   },
   emits: ['update:modelValue'],
