@@ -95,7 +95,7 @@ import {
   parseJtPhonology,
   serializeJtPhonology,
 } from 'tracejs';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import FileUpload from '../../components/FileUpload.vue';
 import { CONTINUA, NUM_FEATURES } from '../../constants';
 import { getStore } from '../../store';
@@ -122,13 +122,28 @@ export default defineComponent({
     };
     const deleteSelected = () => {
       const index = store.config.phonology.indexOf(activePhoneme.value);
-      const sortedIndex = store.config.phonology.indexOf(activePhoneme.value);
+      const sortedIndex = sortedPhonemes.value.indexOf(activePhoneme.value);
       if (index >= 0) {
         store.config.phonology.splice(index, 1);
         activePhoneme.value =
           sortedPhonemes.value[Math.min(sortedIndex, sortedPhonemes.value.length - 1)];
       }
     };
+
+    // If the config gets replaced and the active phoneme no longer exists, try
+    // to find the active phoneme with the same label. Otherwise, pick the first
+    // phoneme.
+    watch(
+      () => sortedPhonemes.value,
+      () => {
+        if (!sortedPhonemes.value.includes(activePhoneme.value)) {
+          activePhoneme.value =
+            sortedPhonemes.value.find((phoneme) => phoneme.label === activePhoneme.value.label) ??
+            sortedPhonemes.value[0];
+        }
+      },
+      { deep: true }
+    );
 
     return {
       errors,
