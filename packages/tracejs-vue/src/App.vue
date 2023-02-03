@@ -45,28 +45,8 @@ export default defineComponent({
         component: defineAsyncComponent(() => import('./views/ChartTab.vue')),
       },
       {
-        label: 'Chart Data',
-        component: defineAsyncComponent(() => import('./views/ChartDataTab.vue')),
-      },
-      {
-        label: 'Input',
-        component: defineAsyncComponent(() => import('./views/InputTab.vue')),
-      },
-      {
-        label: 'Feature',
-        component: defineAsyncComponent(() => import('./views/FeatureTab.vue')),
-      },
-      {
-        label: 'Phoneme',
-        component: defineAsyncComponent(() => import('./views/PhonemeTab.vue')),
-      },
-      {
-        label: 'Word',
-        component: defineAsyncComponent(() => import('./views/WordTab.vue')),
-      },
-      {
-        label: 'Levels and Flow',
-        component: defineAsyncComponent(() => import('./views/LevelsAndFlowTab.vue')),
+        label: 'Data',
+        component: defineAsyncComponent(() => import('./views/AllDataTab.vue')),
       },
     ];
     const activeIndex = ref(0);

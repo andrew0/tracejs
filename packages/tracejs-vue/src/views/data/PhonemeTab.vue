@@ -4,17 +4,17 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { getStore } from '../store';
+import { getStore } from '../../store';
 import DataTab from './DataTab.vue';
 
 export default defineComponent({
-  name: 'FeatureTab',
+  name: 'PhonemeTab',
   components: {
     DataTab,
   },
   setup() {
     return {
-      data: getStore().formattedFeatureData,
+      data: getStore().formattedPhonemeData,
     };
   },
 });
