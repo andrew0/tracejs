@@ -1558,13 +1558,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:~2.8.0":
-  version: 2.8.0
-  resolution: "chart.js@npm:2.8.0"
+"chart.js@npm:~2.9.4":
+  version: 2.9.4
+  resolution: "chart.js@npm:2.9.4"
   dependencies:
     chartjs-color: ^2.1.0
     moment: ^2.10.2
-  checksum: 7c648de17d1dd90bf2cfaf88fdbc0aafd69da15b112caf93765f4ac7a6a357cd427b93a20808f5d4ed3d4106bfb6be59d1c1340c7e8695a1bb290e666c75eb1a
+  checksum: cbdc7abe2fa65e4838848e68b035ae6048ebcc512b9057d7cdb6d361e728400d39e3fde75e0b4da815ab43f7890c31787d8f80d4e6ab75a3e80fc75b47cd173c
   languageName: node
   linkType: hard
 
@@ -3923,7 +3923,7 @@ __metadata:
     "@vitejs/plugin-vue": ^4.0.0
     "@vue/compiler-sfc": ^3.2.45
     bulma: ^0.9.4
-    chart.js: ~2.8.0
+    chart.js: ~2.9.4
     file-saver: ^2.0.5
     hash-sum: ^2.0.0
     prettier: ^2.8.3
