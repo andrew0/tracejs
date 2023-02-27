@@ -15,18 +15,30 @@ Chart.controllers.box = Chart.DatasetController.extend({
     }
   },
 
-  updateElement(item, index, reset) {
+  updateElement(item, index) {
     const dataset = this.getDataset();
     const datasetIndex = this.index;
     const value = dataset.data[index];
     const xScale = this._xScale;
     const yScale = this._yScale;
     const options = this._resolveElementOptions(item, index);
-    const x = reset ? xScale.getBasePixel() : xScale.getPixelForValue(value, index, datasetIndex);
-    const y = reset ? yScale.getBasePixel() : yScale.getPixelForValue(value, index, datasetIndex);
-    const h = options.height;
-    const w = options.width;
-    const halfH = h / 2;
+
+    // calculate the start X position of the chart
+    const xZero = xScale.getPixelForTick(0);
+    // calculate the width of a single X tick
+    const xTickWidth = xScale.getPixelForTick(1) - xZero;
+
+    const getPixelForCharacterAtIndex = (index) =>
+      xZero + xTickWidth * (value.x + index * dataset.characterWidth);
+
+    const x = getPixelForCharacterAtIndex(0);
+    const y = yScale.getPixelForValue(value);
+
+    const width = getPixelForCharacterAtIndex(value.word.length) - x;
+    const halfWidth = width / 2;
+
+    const height = options.height;
+    const halfHeight = height / 2;
 
     item._xScale = xScale;
     item._yScale = yScale;
@@ -34,13 +46,14 @@ Chart.controllers.box = Chart.DatasetController.extend({
     item._datasetIndex = datasetIndex;
     item._index = index;
 
+    const xPadding = 15;
     item._model = {
-      xCenter: x,
-      x: x,
-      base: y - halfH,
-      y: y + halfH,
-      width: w,
-      height: h,
+      getPixelForCharacterAtIndex,
+      x: x + halfWidth,
+      base: y - halfHeight,
+      y: y + halfHeight,
+      width: width + xPadding * 2,
+      height: height,
       backgroundColor: options.backgroundColor,
       borderColor: options.borderColor,
       borderSkipped: options.borderSkipped,
@@ -56,17 +69,23 @@ Chart.controllers.box = Chart.DatasetController.extend({
     const ctx = this.chart.ctx;
 
     for (const dataElement of data) {
-      const { word, xCenter, y, height, borderColor } = dataElement._model;
-      const xPadding = 10;
+      const { word, getPixelForCharacterAtIndex, y, height, borderColor } = dataElement._model;
 
       ctx.save();
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
-      ctx.font = 'bold 16px "Helvetica Neue", Helvetica, Arial, sans-serif';
+      ctx.font = 'bold 16px monospace';
       ctx.fillStyle = borderColor;
-      dataElement._model.width = ctx.measureText(word).width + xPadding * 2;
-      dataElement._model.x = xCenter + dataElement._model.width / 2 - xPadding;
-      ctx.fillText(word, dataElement._model.x, y - height / 2);
+      for (let i = 0; i < word.length; i++) {
+        const actualWidth = ctx.measureText(word[i]).width;
+        const desiredWidth = getPixelForCharacterAtIndex(i + 1) - getPixelForCharacterAtIndex(i);
+        const scaleX = desiredWidth / actualWidth;
+
+        const x = getPixelForCharacterAtIndex(i) + desiredWidth / 2;
+        ctx.scale(scaleX, 1);
+        ctx.fillText(word[i], x / scaleX, y - height / 2);
+        ctx.scale(1 / scaleX, 1);
+      }
       ctx.restore();
 
       dataElement.draw();

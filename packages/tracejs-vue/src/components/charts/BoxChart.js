@@ -90,8 +90,17 @@ export default defineComponent({
       },
     };
   },
+  computed: {
+    // The width in X ticks that each character should be drawn
+    characterWidth() {
+      return this.simConfig ? this.simConfig.deltaInput / this.simConfig.slicesPerPhon : 1;
+    },
+  },
   watch: {
     chartData() {
+      this.updateChart();
+    },
+    characterWidth() {
       this.updateChart();
     },
   },
@@ -118,7 +127,7 @@ export default defineComponent({
       const chartData = {
         datasets: [
           {
-            label: 'My Matrix',
+            characterWidth: this.characterWidth,
             data: this.chartData,
             backgroundColor: () => 'transparent',
             borderColor: (ctx) =>
@@ -126,10 +135,6 @@ export default defineComponent({
                 ? wordColors[ctx.dataset.data[ctx.dataIndex].word]
                 : 'transparent',
             borderWidth: () => this.borderWidth,
-            width: (ctx) => {
-              const { right, left } = ctx.chart.chartArea;
-              return ((right - left) / this.options.scales.xAxes[0].ticks.max) * 5;
-            },
             height: (ctx) => {
               const { bottom, top } = ctx.chart.chartArea;
               return (bottom - top) / this.options.scales.yAxes[0].ticks.max / 10;
