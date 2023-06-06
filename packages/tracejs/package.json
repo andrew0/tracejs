@@ -28,7 +28,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "fast-xml-parser": "^4.0.15",
+    "fast-xml-parser": "^4.2.4",
     "typanion": "^3.12.1"
   },
   "devDependencies": {

@@ -1993,14 +1993,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-xml-parser@npm:^4.0.15":
-  version: 4.0.15
-  resolution: "fast-xml-parser@npm:4.0.15"
+"fast-xml-parser@npm:^4.2.4":
+  version: 4.2.4
+  resolution: "fast-xml-parser@npm:4.2.4"
   dependencies:
     strnum: ^1.0.5
   bin:
     fxparser: src/cli/cli.js
-  checksum: bf0f2cba65d6ef40bee95e8b05b48738c53260ac0f8e7e938861364dae8d242ee6fa7247079d0b8a53ddd67bfb2468ac04b64c418ac44ff5cccafb72a4a760aa
+  checksum: d3b4d0c0152c09f98def792769fca6bb3fa1d597f9745d9564451c239089bd86bdf573c9263b4944860028cb7edb81752d64399c1aff8b87c9225ecef96905f7
   languageName: node
   linkType: hard
 
@@ -3941,7 +3941,7 @@ __metadata:
   dependencies:
     "@types/jest": ^29.4.0
     "@types/node": ^12.20.55
-    fast-xml-parser: ^4.0.15
+    fast-xml-parser: ^4.2.4
     jest: ^29.4.1
     prettier: ^2.8.3
     ts-jest: ^29.0.5
