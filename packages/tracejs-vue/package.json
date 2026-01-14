@@ -10,7 +10,7 @@
   "dependencies": {
     "@progress/jszip-esm": "^1.0.3",
     "bulma": "^0.9.4",
-    "chart.js": "~2.8.0",
+    "chart.js": "~2.9.4",
     "file-saver": "^2.0.5",
     "hash-sum": "^2.0.0",
     "tracejs": "*",
